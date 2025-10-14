@@ -1,0 +1,80 @@
+[
+  {
+    "id": "ACH-2023-001",
+    "fournisseur": "Fournisseur A",
+    "date": "2023-10-10",
+    "statut": "payé",
+    "totalHT": 1500.00,
+    "totalTTC": 1800.00,
+    "tva": 300.00,
+    "articles": [
+      {
+        "id": "ART-001",
+        "nom": "Ordinateur Portable",
+        "quantite": 2,
+        "prixUnitaireHT": 600.00,
+        "tauxTVA": 20,
+        "montantHT": 1200.00,
+        "montantTTC": 1440.00
+      },
+      {
+        "id": "ART-002",
+        "nom": "Souris sans fil",
+        "quantite": 5,
+        "prixUnitaireHT": 60.00,
+        "tauxTVA": 20,
+        "montantHT": 300.00,
+        "montantTTC": 360.00
+      }
+    ]
+  },
+  {
+    "id": "ACH-2023-002",
+    "fournisseur": "Fournisseur B",
+    "date": "2023-10-05",
+    "statut": "en attente",
+    "totalHT": 750.00,
+    "totalTTC": 900.00,
+    "tva": 150.00,
+    "articles": [
+      {
+        "id": "ART-003",
+        "nom": "Clavier mécanique",
+        "quantite": 3,
+        "prixUnitaireHT": 200.00,
+        "tauxTVA": 20,
+        "montantHT": 600.00,
+        "montantTTC": 720.00
+      },
+      {
+        "id": "ART-004",
+        "nom": "Tapis de souris",
+        "quantite": 5,
+        "prixUnitaireHT": 30.00,
+        "tauxTVA": 20,
+        "montantHT": 150.00,
+        "montantTTC": 180.00
+      }
+    ]
+  },
+  {
+    "id": "ACH-2023-003",
+    "fournisseur": "Fournisseur C",
+    "date": "2023-09-28",
+    "statut": "annulé",
+    "totalHT": 1200.00,
+    "totalTTC": 1440.00,
+    "tva": 240.00,
+    "articles": [
+      {
+        "id": "ART-005",
+        "nom": "Écran 24\"",
+        "quantite": 2,
+        "prixUnitaireHT": 600.00,
+        "tauxTVA": 20,
+        "montantHT": 1200.00,
+        "montantTTC": 1440.00
+      }
+    ]
+  }
+]
