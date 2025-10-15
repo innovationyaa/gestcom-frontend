@@ -5,7 +5,6 @@ import {
   Search,
   Filter,
   Download,
-  Upload,
   CheckCircle,
   Clock,
   XCircle,
@@ -19,68 +18,25 @@ import { fr } from "date-fns/locale";
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable } from "@/components/ui/DataTable";
-
-// Mock data - replace with real data from your API
-const MOCK_FACTURES = [
-  {
-    id: 1,
-    numero: "FAC-2023-001",
-    fournisseur: { id: 1, nom: "Fournisseur A" },
-    date: "2023-11-15",
-    dateEcheance: "2023-12-15",
-    montantHT: 1200,
-    tva: 240,
-    montantTTC: 1440,
-    statut: "payee",
-    notes: "",
-  },
-  {
-    id: 2,
-    numero: "FAC-2023-002",
-    fournisseur: { id: 2, nom: "Fournisseur B" },
-    date: "2023-11-20",
-    dateEcheance: "2023-12-20",
-    montantHT: 850,
-    tva: 170,
-    montantTTC: 1020,
-    statut: "en_retard",
-    notes: "À payer rapidement",
-  },
-  {
-    id: 3,
-    numero: "FAC-2023-003",
-    fournisseur: { id: 3, nom: "Fournisseur C" },
-    date: "2023-11-25",
-    dateEcheance: "2024-01-10",
-    montantHT: 2300,
-    tva: 460,
-    montantTTC: 2760,
-    statut: "brouillon",
-    notes: "Brouillon en attente de validation",
-  },
-  {
-    id: 4,
-    numero: "FAC-2023-004",
-    fournisseur: { id: 1, nom: "Fournisseur A" },
-    date: "2023-11-28",
-    dateEcheance: "2023-12-28",
-    montantHT: 650,
-    tva: 130,
-    montantTTC: 780,
-    statut: "annulee",
-    notes: "Commande annulée",
-  },
-];
+import { SimpleDateRangePicker } from "@/components/ui/simple-date-range-picker";
+import centralDataService from "@/services/centralDataService";
+import { DetailModal, FactureDetailModal } from "@/components/modals";
 
 export const STATUT_FACTURE = {
   PAYEE: "payee",
+  EN_ATTENTE: "en_attente",
   EN_RETARD: "en_retard",
   ANNULEE: "annulee",
-  BROUILLON: "brouillon",
 };
 
 const getStatusBadge = (status, dateEcheance) => {
@@ -140,32 +96,64 @@ const Factures = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("toutes");
+  const [statusFilter, setStatusFilter] = useState("");
   const [factures, setFactures] = useState([]);
-  const [filteredFactures, setFilteredFactures] = useState([]);
-
+  const [filteredFactures, setFilteredFactures] = useState([]);  const [dateRange, setDateRange] = useState({
+    from: undefined,
+    to: undefined,
+  });
+  const [selectedFacture, setSelectedFacture] = useState(null);
+  const [showFactureModal, setShowFactureModal] = useState(false);
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setFactures(MOCK_FACTURES);
-      setFilteredFactures(MOCK_FACTURES);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    // Load data from central service
+    const loadFactures = async () => {
+      try {
+        setLoading(true);
+        const facturesData = await centralDataService.getFactures();
+        setFactures(facturesData);
+        setFilteredFactures(facturesData);
+      } catch (error) {
+        console.error('Error loading factures:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    // Filter factures based on search term
-    const filtered = factures.filter(
+    loadFactures();
+  }, []);  useEffect(() => {
+    // Filter factures based on search term, date range, and status
+    let filtered = factures.filter(
       (facture) =>
         facture.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        facture.fournisseur.nom.toLowerCase().includes(searchTerm.toLowerCase())
+        facture.fournisseur.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredFactures(filtered);
-  }, [factures, searchTerm]);
 
+    // Apply status filter
+    if (statusFilter && statusFilter !== "all") {
+      filtered = filtered.filter((facture) => facture.statut === statusFilter);
+    }
+
+    // Apply date range filter if both dates are selected
+    if (dateRange.from && dateRange.to) {
+      filtered = filtered.filter((facture) => {
+        const factureDate = new Date(facture.date);
+        return factureDate >= dateRange.from && factureDate <= dateRange.to;
+      });
+    }
+
+    setFilteredFactures(filtered);
+  }, [factures, searchTerm, dateRange, statusFilter]);
   const handleViewFacture = (facture) => {
-    console.log("View facture:", facture.id);
-    // Implement view logic
+    setSelectedFacture(facture);
+    setShowFactureModal(true);
+  };
+  const handleCloseFactureModal = () => {
+    setShowFactureModal(false);
+    setSelectedFacture(null);
+  };
+
+  const handleRowClick = (facture) => {
+    handleViewFacture(facture);
   };
 
   const handleDownloadFacture = (facture) => {
@@ -177,9 +165,8 @@ const Factures = () => {
     console.log("Print facture:", facture.id);
     // Implement print logic
   };
-
   const handleNewFacture = () => {
-    navigate("/achats/factures/nouvelle");
+    navigate("/commandes/factures/nouvelle");
   };
 
   const getTotalFactures = (status) => {
@@ -191,11 +178,10 @@ const Factures = () => {
     {
       header: "Numéro",
       accessor: "numero",
-    },
-    {
+    },    {
       header: "Fournisseur",
       accessor: "fournisseur",
-      cell: (row) => row.fournisseur?.nom || "N/A",
+      cell: (row) => row.fournisseur || "N/A",
     },
     {
       header: "Date",
@@ -264,12 +250,7 @@ const Factures = () => {
           </Button>
         </div>
       ),
-    },
-  ];
-
-  const handleRowClick = (facture) => {
-    handleViewFacture(facture);
-  };
+    },  ];
 
   return (
     <div className="space-y-8 p-4">
@@ -282,18 +263,22 @@ const Factures = () => {
           <p className="text-[var(--color-foreground-muted)] text-xs">
             Gérez et suivez vos factures fournisseurs en temps réel
           </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" className="h-10">
-            <Download className="mr-2 h-4 w-4" />
+        </div>{" "}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+          >
+            <Download className="h-4 w-4 mr-1" />
             Exporter
           </Button>
-          <Button variant="outline" size="sm" className="h-10">
-            <Upload className="mr-2 h-4 w-4" />
-            Importer
-          </Button>
-          <Button onClick={handleNewFacture} className="h-10">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button
+            size="sm"
+            onClick={handleNewFacture}
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
+          >
+            <Plus className="h-4 w-4 mr-1" />
             Nouvelle facture
           </Button>
         </div>
@@ -303,89 +288,114 @@ const Factures = () => {
       <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
         <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
           Liste des Factures
-        </h2>
+        </h2>{" "}
         <div className="space-y-4">
-          {/* Filtres et recherche */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="relative w-full md:w-1/3">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          {/* Search and Filters Container */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-foreground-muted)]" />
               <Input
                 placeholder="Rechercher une facture..."
-                className="pl-9 w-full"
+                className="pl-9 bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="h-9">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtres
-              </Button>
+            </div>{" "}
+            {/* Filters */}
+            <div className="flex items-center gap-3">
+              {/* Date Range Picker */}
+              <SimpleDateRangePicker
+                date={dateRange}
+                setDate={setDateRange}
+                className="w-auto"
+              />
+
+              {/* Status filter */}
+              <Select
+                value={statusFilter || "all"}
+                onValueChange={setStatusFilter}
+              >
+                <SelectTrigger className="w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
+                  <SelectItem
+                    value="all"
+                    className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    Tous les statuts
+                  </SelectItem>
+                  <SelectItem
+                    value="payee"
+                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    Payées
+                  </SelectItem>
+                  <SelectItem
+                    value="en_retard"
+                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    En retard
+                  </SelectItem>                  <SelectItem
+                    value="en_attente"
+                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    En attente
+                  </SelectItem>
+                  <SelectItem
+                    value="annulee"
+                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    Annulées
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          {/* Tableau avec onglets */}
+          {/* Tableau des factures */}
           <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
-            <Tabs defaultValue="toutes" className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-4">
-                <TabsList>
-                  <TabsTrigger value="toutes">Toutes</TabsTrigger>
-                  <TabsTrigger value="payee">Payées</TabsTrigger>
-                  <TabsTrigger value="en_retard">En retard</TabsTrigger>
-                  <TabsTrigger value="brouillon">Brouillons</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="toutes" className="p-0">
-                <DataTable
-                  columns={columns}
-                  data={filteredFactures}
-                  loading={loading}
-                  onRowClick={handleRowClick}
-                  emptyMessage="Aucune facture trouvée. Commencez par ajouter une nouvelle facture."
-                  rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-                />
-              </TabsContent>
-              <TabsContent value="payee" className="p-0">
-                <DataTable
-                  columns={columns}
-                  data={filteredFactures.filter(
-                    (f) => f.statut === STATUT_FACTURE.PAYEE
-                  )}
-                  loading={loading}
-                  onRowClick={handleRowClick}
-                  emptyMessage="Aucune facture payée trouvée."
-                  rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-                />
-              </TabsContent>
-              <TabsContent value="en_retard" className="p-0">
-                <DataTable
-                  columns={columns}
-                  data={filteredFactures.filter(
-                    (f) => f.statut === STATUT_FACTURE.EN_RETARD
-                  )}
-                  loading={loading}
-                  onRowClick={handleRowClick}
-                  emptyMessage="Aucune facture en retard trouvée."
-                  rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-                />
-              </TabsContent>
-              <TabsContent value="brouillon" className="p-0">
-                <DataTable
-                  columns={columns}
-                  data={filteredFactures.filter(
-                    (f) => f.statut === STATUT_FACTURE.BROUILLON
-                  )}
-                  loading={loading}
-                  onRowClick={handleRowClick}
-                  emptyMessage="Aucun brouillon trouvé."
-                  rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
+            <DataTable
+              columns={columns}
+              data={filteredFactures}
+              loading={loading}
+              onRowClick={handleRowClick}
+              emptyMessage="Aucune facture trouvée. Commencez par ajouter une nouvelle facture."
+              rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
+            />          </div>
         </div>
       </div>
+
+      {/* Facture Detail Modal */}
+      <DetailModal
+        isOpen={showFactureModal}
+        onClose={handleCloseFactureModal}
+        title="Détail de la Facture"
+        size="large"
+      >
+        <FactureDetailModal
+          facture={selectedFacture}
+          onClose={handleCloseFactureModal}
+          onEdit={(facture) => {
+            console.log('Edit facture:', facture);
+            handleCloseFactureModal();
+            // TODO: Implement edit functionality
+          }}
+          onDownload={(facture) => {
+            console.log('Download facture:', facture);
+            handleDownloadFacture(facture);
+          }}
+          onPrint={(facture) => {
+            console.log('Print facture:', facture);
+            handlePrintFacture(facture);
+          }}
+          onSendEmail={(facture) => {
+            console.log('Send email facture:', facture);
+            // TODO: Implement email functionality
+          }}
+        />
+      </DetailModal>
     </div>
   );
 };

@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowUpDown, Edit, Trash2, AlertTriangle, Package, TrendingDown } from 'lucide-react'
 import { STOCK_STATUS } from '../utils/constants'
 
-export function StockTable({ stockItems, loading, onSort, sortBy, sortOrder }) {
+export function StockTable({ stockItems, loading, onSort, sortBy, sortOrder, onRowClick }) {
   const getStatusIcon = (status) => {
     switch (status) {
       case STOCK_STATUS.OUT_OF_STOCK:
@@ -138,9 +138,10 @@ export function StockTable({ stockItems, loading, onSort, sortBy, sortOrder }) {
                 stockItems.map((item, index) => (
                   <TableRow
                     key={item.id}
-                    className={`hover:bg-[var(--color-background)] transition-colors duration-200 ${
+                    className={`hover:bg-[var(--color-background)] transition-colors duration-200 cursor-pointer ${
                       index % 2 === 0 ? 'bg-[var(--color-surface)]' : 'bg-[var(--color-background)]'
                     }`}
+                    onClick={() => onRowClick && onRowClick(item)}
                   >
                     <TableCell className="font-medium text-[var(--color-foreground)]">
                       {item.reference}
@@ -180,6 +181,10 @@ export function StockTable({ stockItems, loading, onSort, sortBy, sortOrder }) {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement edit functionality
+                          }}
                           className="hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
                         >
                           <Edit className="h-4 w-4" />
@@ -187,6 +192,10 @@ export function StockTable({ stockItems, loading, onSort, sortBy, sortOrder }) {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement delete functionality
+                          }}
                           className="hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
                         >
                           <Trash2 className="h-4 w-4" />

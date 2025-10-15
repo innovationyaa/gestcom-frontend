@@ -1,14 +1,14 @@
-export const STATUT_ACHAT = {
+export const STATUT_COMMANDE = {
   PAYE: 'payé',
   EN_ATTENTE: 'en attente',
   ANNULE: 'annulé'
 };
 
-export const STATUT_ACHAT_OPTIONS = [
+export const STATUT_COMMANDE_OPTIONS = [
   { value: 'all', label: 'Tous les statuts' },
-  { value: STATUT_ACHAT.PAYE, label: 'Payé' },
-  { value: STATUT_ACHAT.EN_ATTENTE, label: 'En attente' },
-  { value: STATUT_ACHAT.ANNULE, label: 'Annulé' }
+  { value: STATUT_COMMANDE.PAYE, label: 'Payé' },
+  { value: STATUT_COMMANDE.EN_ATTENTE, label: 'En attente' },
+  { value: STATUT_COMMANDE.ANNULE, label: 'Annulé' }
 ];
 
 export const COLUMNS = [

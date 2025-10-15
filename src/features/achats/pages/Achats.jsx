@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -40,19 +40,19 @@ import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 
 // App Components
-import { AchatsStats } from "../components/AchatsStats";
-import { AchatsFilters } from "../components/AchatsFilters";
-import { AddAchatForm } from "../components/AddAchatForm";
-import { useAchats } from "../hooks/useAchats";
-import { STATUT_ACHAT, STATUT_ACHAT_OPTIONS } from "../utils/constants";
+import { CommandesStats } from "../components/CommandesStats";
+import { AddCommandeForm } from "../components/AddCommandeForm";
+import { useCommandes } from "../hooks/useCommandes";
+import { STATUT_COMMANDE, STATUT_COMMANDE_OPTIONS } from "../utils/constants";
+import { DetailModal, CommandeDetailModal } from "@/components/modals";
 
-export const Achats = () => {
-  const navigate = useNavigate();
-  const [showFilters, setShowFilters] = useState(true);
+export const Commandes = () => {
+  const navigate = useNavigate();  const [showFilters, setShowFilters] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
-
+  const [selectedCommande, setSelectedCommande] = useState(null);
+  const [showCommandeModal, setShowCommandeModal] = useState(false);
   const {
-    achats,
+    commandes,
     loading,
     error,
     filters,
@@ -61,14 +61,13 @@ export const Achats = () => {
     handleSort,
     handleFilterChange,
     resetFilters,
-    addAchat,
-    deleteAchat,
+    addCommande,
+    deleteCommande,
     refreshData,
-  } = useAchats();
-
+  } = useCommandes();
   // Gestion de la soumission du formulaire d'ajout
-  const handleAddAchat = async (formData) => {
-    const result = await addAchat(formData);
+  const handleAddCommande = async (formData) => {
+    const result = await addCommande(formData);
     if (result.success) {
       setShowAddForm(false);
       await refreshData();
@@ -76,10 +75,10 @@ export const Achats = () => {
     return result;
   };
 
-  // Gestion de la suppression d'un achat
-  const handleDeleteAchat = async (achat) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet achat ?")) {
-      await deleteAchat(achat.id);
+  // Gestion de la suppression d'une commande
+  const handleDeleteCommande = async (commande) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette commande ?")) {
+      await deleteCommande(commande.id);
       await refreshData();
     }
   };
@@ -114,9 +113,8 @@ export const Achats = () => {
     {
       header: "Statut",
       accessor: "statut",
-      cell: (row) => {
-        switch (row.statut) {
-          case STATUT_ACHAT.PAYE:
+      cell: (row) => {        switch (row.statut) {
+          case STATUT_COMMANDE.PAYE:
             return (
               <Badge
                 variant="secondary"
@@ -126,7 +124,7 @@ export const Achats = () => {
                 Payé
               </Badge>
             );
-          case STATUT_ACHAT.EN_ATTENTE:
+          case STATUT_COMMANDE.EN_ATTENTE:
             return (
               <Badge
                 variant="secondary"
@@ -136,7 +134,7 @@ export const Achats = () => {
                 En attente
               </Badge>
             );
-          case STATUT_ACHAT.ANNULE:
+          case STATUT_COMMANDE.ANNULE:
             return (
               <Badge
                 variant="secondary"
@@ -159,10 +157,9 @@ export const Achats = () => {
         <div className="flex justify-end gap-2">
           <Button
             variant="ghost"
-            size="sm"
-            onClick={(e) => {
+            size="sm"            onClick={(e) => {
               e.stopPropagation();
-              navigate(`/achats/${row.id}`);
+              navigate(`/commandes/${row.id}`);
             }}
             className="h-8 w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
           >
@@ -170,10 +167,9 @@ export const Achats = () => {
           </Button>
           <Button
             variant="ghost"
-            size="sm"
-            onClick={(e) => {
+            size="sm"            onClick={(e) => {
               e.stopPropagation();
-              handleDeleteAchat(row);
+              handleDeleteCommande(row);
             }}
             className="h-8 w-8 p-0 hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
           >
@@ -182,69 +178,59 @@ export const Achats = () => {
         </div>
       ),
     },
-  ];
-
-  // Gestion du clic sur une ligne
-  const handleRowClick = (achat) => {
-    navigate(`/achats/${achat.id}`);
+  ];  // Gestion du clic sur une ligne
+  const handleRowClick = (commande) => {
+    setSelectedCommande(commande);
+    setShowCommandeModal(true);
   };
 
-  // Filter achats based on search and filters
-  const filteredAchats = React.useMemo(() => {
-    return achats.filter((achat) => {
-      // Search term filter
+  const handleCloseCommandeModal = () => {
+    setShowCommandeModal(false);
+    setSelectedCommande(null);
+  };
+  // Filter commandes based on search and filters
+  const filteredCommandes = useMemo(() => {
+    return commandes.filter((commande) => {      // Search term filter
       const searchTerm = filters.search || "";
       const matchesSearch =
         !searchTerm ||
-        achat.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        achat.fournisseur?.nom
+        commande.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        commande.fournisseur?.nom
           ?.toLowerCase()
-          .includes(searchTerm.toLowerCase());
-
-      // Status filter
-      const matchesStatus = !filters.statut || achat.statut === filters.statut;
+          .includes(searchTerm.toLowerCase()); // Status filter
+      const matchesStatus =
+        !filters.statut ||
+        filters.statut === "all" ||
+        commande.statut === filters.statut;
 
       // Date range filter
-      const achatDate = achat.date ? new Date(achat.date) : null;
+      const commandeDate = commande.date ? new Date(commande.date) : null;
       const matchesDate =
         !filters.dateFrom ||
         !filters.dateTo ||
-        !achatDate ||
-        (achatDate >= new Date(filters.dateFrom) &&
-          achatDate <= new Date(filters.dateTo));
-
-      // Supplier filter
-      const supplierName = achat.fournisseur?.nom || "";
-      const matchesSupplier =
-        !filters.fournisseur ||
-        supplierName
-          .toLowerCase()
-          .includes((filters.fournisseur || "").toLowerCase());
+        !commandeDate ||
+        (commandeDate >= new Date(filters.dateFrom) &&          commandeDate <= new Date(filters.dateTo));
 
       // Amount range filter
-      const amount = parseFloat(achat.montantTotal || 0);
+      const amount = parseFloat(commande.montantTotal || 0);
       const minAmount = parseFloat(filters.montantMin || 0) || 0;
       const maxAmount =
         parseFloat(filters.montantMax || Number.MAX_SAFE_INTEGER) ||
         Number.MAX_SAFE_INTEGER;
-      const matchesAmount = amount >= minAmount && amount <= maxAmount;
-
-      return (
+      const matchesAmount = amount >= minAmount && amount <= maxAmount;      return (
         matchesSearch &&
         matchesStatus &&
         matchesDate &&
-        matchesSupplier &&
         matchesAmount
       );
     });
-  }, [achats, filters]);
+  }, [commandes, filters]);
 
   if (error) {
-    return (
-      <div className="space-y-8 p-4">
+    return (      <div className="space-y-8 p-4">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold text-[var(--color-foreground)]">
-            Gestion des Achats
+            Gestion des Commandes
           </h1>
           <p className="text-[var(--color-foreground-muted)] text-xs">
             Gérez vos commandes fournisseurs et suivez vos approvisionnements
@@ -268,10 +254,9 @@ export const Achats = () => {
   return (
     <div className="space-y-8 p-4">
       {/* En-tête de la page */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
+      <div className="flex items-center justify-between">        <div className="space-y-1">
           <h1 className="text-xl font-semibold text-[var(--color-foreground)]">
-            Gestion des Achats
+            Gestion des Commandes
           </h1>
           <p className="text-[var(--color-foreground-muted)] text-xs">
             Gérez vos commandes fournisseurs et suivez vos approvisionnements
@@ -294,49 +279,102 @@ export const Achats = () => {
             size="sm"
             onClick={() => setShowAddForm(true)}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Nouvel Achat
+          >            <Plus className="h-4 w-4 mr-1" />
+            Nouvelle Commande
           </Button>
         </div>
-      </div>
-
-      {/* Statistiques */}
-      <AchatsStats stats={stats} />
-
-      {/* Filtres */}
-      <AchatsFilters
-        filters={filters}
-        achats={filteredAchats}
-        onFilterChange={(key, value) => handleFilterChange({ [key]: value })}
-        onReset={resetFilters}
-      />
-
-      {/* Liste des Achats */}
+      </div>      {/* Statistiques */}
+      <CommandesStats stats={stats} /> {/* Liste des Commandes */}
       <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
         <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
-          Liste des Achats
+          Liste des Commandes
         </h2>
+
+        {/* Search and Filters Container */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          {/* Search Bar */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-foreground-muted)]" />
+            <Input
+              placeholder="Rechercher..."
+              value={filters.search || ""}
+              onChange={(e) => handleFilterChange({ search: e.target.value })}
+              className="pl-9 bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20"
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="flex items-center gap-3">
+            {/* Status filter */}
+            <Select
+              value={filters.statut || "all"}
+              onValueChange={(value) =>
+                handleFilterChange({ statut: value === "all" ? null : value })
+              }
+            >
+              <SelectTrigger className="w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
+                <SelectItem
+                  value="all"
+                  className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                >
+                  Tous les statuts
+                </SelectItem>
+                {STATUT_COMMANDE_OPTIONS.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <DataTable
           columns={columns}
-          data={filteredAchats}
+          data={filteredCommandes}
           loading={loading}
           onRowClick={handleRowClick}
-          emptyMessage="Aucun achat trouvé. Commencez par ajouter un nouvel achat."
+          emptyMessage="Aucune commande trouvée. Commencez par ajouter une nouvelle commande."
           rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
         />
-      </div>
-
-      {/* Formulaire d'ajout */}
+      </div>      {/* Formulaire d'ajout */}
       {showAddForm && (
-        <AddAchatForm
+        <AddCommandeForm
           open={showAddForm}
           onOpenChange={setShowAddForm}
-          onSubmit={handleAddAchat}
+          onSubmit={handleAddCommande}
         />
       )}
+
+      {/* Commande Detail Modal */}
+      <DetailModal
+        isOpen={showCommandeModal}
+        onClose={handleCloseCommandeModal}
+        title="Détail de la Commande"
+        size="large"
+      >
+        <CommandeDetailModal
+          commande={selectedCommande}
+          onClose={handleCloseCommandeModal}
+          onEdit={(commande) => {
+            console.log('Edit commande:', commande);
+            handleCloseCommandeModal();
+            // TODO: Implement edit functionality
+          }}
+          onDownload={(commande) => {
+            console.log('Download commande:', commande);
+            // TODO: Implement download functionality
+          }}
+        />
+      </DetailModal>
     </div>
   );
 };
 
-export default Achats;
+export default Commandes;

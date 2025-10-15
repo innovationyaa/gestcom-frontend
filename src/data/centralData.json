@@ -1,0 +1,577 @@
+{
+  "entreprise": {
+    "nom": "GestCom Enterprise",
+    "adresse": "123 Rue du Commerce, 75001 Paris",
+    "telephone": "+33 1 23 45 67 89",
+    "email": "contact@gestcom.fr",
+    "siret": "12345678901234"
+  },
+  "clients": [
+    {
+      "id": 1,
+      "nom": "Jean Dupont",
+      "email": "jean.dupont@email.com",
+      "telephone": "+33 6 12 34 56 78",
+      "adresse": "45 Avenue des Champs, 75008 Paris",
+      "type": "particulier",
+      "dateCreation": "2023-01-15",
+      "derniereCommande": "2024-10-10",
+      "totalCommandes": 12,
+      "chiffreAffaires": 2580.50
+    },
+    {
+      "id": 2,
+      "nom": "Marie Martin",
+      "email": "marie.martin@email.com",
+      "telephone": "+33 6 23 45 67 89",
+      "adresse": "78 Rue de la Paix, 69002 Lyon",
+      "type": "particulier",
+      "dateCreation": "2023-02-20",
+      "derniereCommande": "2024-10-09",
+      "totalCommandes": 8,
+      "chiffreAffaires": 1890.00
+    },
+    {
+      "id": 3,
+      "nom": "Pierre Durand",
+      "email": "pierre.durand@email.com",
+      "telephone": "+33 6 34 45 67 89",
+      "adresse": "12 Boulevard Saint-Michel, 13001 Marseille",
+      "type": "particulier",
+      "dateCreation": "2023-03-10",
+      "derniereCommande": "2024-10-09",
+      "totalCommandes": 6,
+      "chiffreAffaires": 1250.75
+    },
+    {
+      "id": 4,
+      "nom": "Sophie Lambert",
+      "email": "sophie.lambert@email.com",
+      "telephone": "+33 6 45 56 78 90",
+      "adresse": "89 Rue Victor Hugo, 33000 Bordeaux",
+      "type": "particulier",
+      "dateCreation": "2023-04-05",
+      "derniereCommande": "2024-10-08",
+      "totalCommandes": 4,
+      "chiffreAffaires": 680.20
+    },
+    {
+      "id": 5,
+      "nom": "Thomas Leroy",
+      "email": "thomas.leroy@email.com",
+      "telephone": "+33 6 56 67 89 01",
+      "adresse": "34 Place de la République, 59000 Lille",
+      "type": "particulier",
+      "dateCreation": "2023-05-12",
+      "derniereCommande": "2024-10-07",
+      "totalCommandes": 3,
+      "chiffreAffaires": 450.90
+    }
+  ],
+  "fournisseurs": [
+    {
+      "id": 1,
+      "nom": "TechSupply Corp",
+      "email": "contact@techsupply.com",
+      "telephone": "+33 1 23 45 67 89",
+      "adresse": "123 Rue de la Technologie, 75001 Paris",
+      "type": "entreprise",
+      "statut": "actif",
+      "siret": "12345678901234",
+      "codePostal": "75001",
+      "ville": "Paris",
+      "pays": "France",
+      "siteweb": "https://techsupply.com",
+      "dateCreation": "2023-01-15",
+      "derniereCommande": "2024-10-10",
+      "totalCommandes": 25,
+      "chiffreAffaires": 125000.50
+    },
+    {
+      "id": 2,
+      "nom": "Bureau Plus SARL",
+      "email": "commandes@bureauplus.fr",
+      "telephone": "+33 2 34 56 78 90",
+      "adresse": "45 Avenue des Bureaux, 69002 Lyon",
+      "type": "entreprise",
+      "statut": "actif",
+      "siret": "23456789012345",
+      "codePostal": "69002",
+      "ville": "Lyon",
+      "pays": "France",
+      "siteweb": "https://bureauplus.fr",
+      "dateCreation": "2023-03-22",
+      "derniereCommande": "2024-10-08",
+      "totalCommandes": 18,
+      "chiffreAffaires": 89750.25
+    },
+    {
+      "id": 3,
+      "nom": "ElectroMax Industries",
+      "email": "ventes@electromax.com",
+      "telephone": "+33 3 45 67 89 01",
+      "adresse": "156 Boulevard Industriel, 59000 Lille",
+      "type": "entreprise",
+      "statut": "actif",
+      "siret": "45678901234567",
+      "codePostal": "59000",
+      "ville": "Lille",
+      "pays": "France",
+      "siteweb": "https://electromax.com",
+      "dateCreation": "2022-11-05",
+      "derniereCommande": "2024-10-05",
+      "totalCommandes": 35,
+      "chiffreAffaires": 198750.80
+    }
+  ],
+  "stock": [
+    {
+      "id": 1,
+      "reference": "ART001",
+      "nom": "Ordinateur Portable Dell",
+      "description": "Ordinateur portable professionnel 15 pouces",
+      "quantite": 25,
+      "prixAchat": 800,
+      "prixVente": 1200,
+      "seuilMinimum": 5,
+      "uniteMesure": "pièces",
+      "categorie": "Informatique",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "dateCreation": "2024-01-15",
+      "dateModification": "2024-10-01"
+    },
+    {
+      "id": 2,
+      "reference": "ART002",
+      "nom": "Souris sans fil Logitech",
+      "description": "Souris ergonomique sans fil Bluetooth",
+      "quantite": 3,
+      "prixAchat": 25,
+      "prixVente": 45,
+      "seuilMinimum": 10,
+      "uniteMesure": "pièces",
+      "categorie": "Accessoires",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "dateCreation": "2024-02-10",
+      "dateModification": "2024-09-28"
+    },
+    {
+      "id": 3,
+      "reference": "ART003",
+      "nom": "Clavier mécanique",
+      "description": "Clavier gaming RGB avec switches bleus",
+      "quantite": 0,
+      "prixAchat": 120,
+      "prixVente": 180,
+      "seuilMinimum": 5,
+      "uniteMesure": "pièces",
+      "categorie": "Accessoires",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "dateCreation": "2024-03-05",
+      "dateModification": "2024-10-02"
+    },
+    {
+      "id": 4,
+      "reference": "ART004",
+      "nom": "Papier A4 Blanc",
+      "description": "Rame de papier blanc 80g/m²",
+      "quantite": 150,
+      "prixAchat": 4.50,
+      "prixVente": 8.90,
+      "seuilMinimum": 20,
+      "uniteMesure": "rames",
+      "categorie": "Fournitures",
+      "fournisseurId": 2,
+      "fournisseur": "Bureau Plus SARL",
+      "dateCreation": "2024-01-20",
+      "dateModification": "2024-09-15"
+    },
+    {
+      "id": 5,
+      "reference": "ART005",
+      "nom": "Imprimante HP LaserJet",
+      "description": "Imprimante laser noir et blanc A4",
+      "quantite": 8,
+      "prixAchat": 180,
+      "prixVente": 320,
+      "seuilMinimum": 3,
+      "uniteMesure": "pièces",
+      "categorie": "Informatique",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "dateCreation": "2024-02-28",
+      "dateModification": "2024-09-20"
+    },
+    {
+      "id": 6,
+      "reference": "ART006",
+      "nom": "Stylos à bille",
+      "description": "Lot de 10 stylos à bille bleus",
+      "quantite": 45,
+      "prixAchat": 3.20,
+      "prixVente": 6.50,
+      "seuilMinimum": 15,
+      "uniteMesure": "lots",
+      "categorie": "Fournitures",
+      "fournisseurId": 2,
+      "fournisseur": "Bureau Plus SARL",
+      "dateCreation": "2024-03-12",
+      "dateModification": "2024-09-25"
+    }
+  ],
+  "commandes": [
+    {
+      "id": 1,
+      "numero": "ORD-001",
+      "clientId": 1,
+      "client": "Jean Dupont",
+      "date": "2024-10-10",
+      "dateLivraison": "2024-10-12",
+      "statut": "completed",
+      "montantHT": 204.17,
+      "tva": 40.83,
+      "montantTTC": 245.50,
+      "items": [
+        {
+          "id": 1,
+          "articleId": 2,
+          "nom": "Souris sans fil Logitech",
+          "quantite": 2,
+          "prixUnitaire": 45,
+          "montant": 90
+        },
+        {
+          "id": 2,
+          "articleId": 4,
+          "nom": "Papier A4 Blanc",
+          "quantite": 15,
+          "prixUnitaire": 8.90,
+          "montant": 133.50
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "numero": "ORD-002",
+      "clientId": 2,
+      "client": "Marie Martin",
+      "date": "2024-10-09",
+      "dateLivraison": "2024-10-11",
+      "statut": "processing",
+      "montantHT": 157.50,
+      "tva": 31.50,
+      "montantTTC": 189.00,
+      "items": [
+        {
+          "id": 1,
+          "articleId": 6,
+          "nom": "Stylos à bille",
+          "quantite": 5,
+          "prixUnitaire": 6.50,
+          "montant": 32.50
+        },
+        {
+          "id": 2,
+          "articleId": 1,
+          "nom": "Ordinateur Portable Dell",
+          "quantite": 1,
+          "prixUnitaire": 1200,
+          "montant": 1200
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "numero": "ORD-003",
+      "clientId": 3,
+      "client": "Pierre Durand",
+      "date": "2024-10-09",
+      "dateLivraison": "2024-10-13",
+      "statut": "pending",
+      "montantHT": 267.29,
+      "tva": 53.46,
+      "montantTTC": 320.75,
+      "items": [
+        {
+          "id": 1,
+          "articleId": 5,
+          "nom": "Imprimante HP LaserJet",
+          "quantite": 1,
+          "prixUnitaire": 320,
+          "montant": 320
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "numero": "ORD-004",
+      "clientId": 4,
+      "client": "Sophie Lambert",
+      "date": "2024-10-08",
+      "dateLivraison": "2024-10-10",
+      "statut": "completed",
+      "montantHT": 130.17,
+      "tva": 26.03,
+      "montantTTC": 156.20,
+      "items": [
+        {
+          "id": 1,
+          "articleId": 3,
+          "nom": "Clavier mécanique",
+          "quantite": 1,
+          "prixUnitaire": 180,
+          "montant": 180
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "numero": "ORD-005",
+      "clientId": 5,
+      "client": "Thomas Leroy",
+      "date": "2024-10-07",
+      "dateLivraison": "2024-10-09",
+      "statut": "failed",
+      "montantHT": 232.42,
+      "tva": 46.48,
+      "montantTTC": 278.90,
+      "items": [
+        {
+          "id": 1,
+          "articleId": 4,
+          "nom": "Papier A4 Blanc",
+          "quantite": 20,
+          "prixUnitaire": 8.90,
+          "montant": 178
+        },
+        {
+          "id": 2,
+          "articleId": 6,
+          "nom": "Stylos à bille",
+          "quantite": 10,
+          "prixUnitaire": 6.50,
+          "montant": 65
+        }
+      ]
+    }  ],
+  "commandes_fournisseurs": [
+    {
+      "id": 1,
+      "reference": "ACH-001",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "date": "2024-10-05",
+      "dateLivraison": "2024-10-08",
+      "statut": "livre",
+      "montantHT": 2500.00,
+      "tva": 500.00,
+      "montantTTC": 3000.00,
+      "notes": "Commande urgente",
+      "items": [
+        {
+          "id": 1,
+          "articleId": 1,
+          "nom": "Ordinateur Portable Dell",
+          "quantite": 3,
+          "prixUnitaire": 800,
+          "montant": 2400
+        },
+        {
+          "id": 2,
+          "articleId": 2,
+          "nom": "Souris sans fil Logitech",
+          "quantite": 4,
+          "prixUnitaire": 25,
+          "montant": 100
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "reference": "ACH-002",
+      "fournisseurId": 2,
+      "fournisseur": "Bureau Plus SARL",
+      "date": "2024-10-03",
+      "dateLivraison": "2024-10-06",
+      "statut": "livre",
+      "montantHT": 800.00,
+      "tva": 160.00,
+      "montantTTC": 960.00,
+      "notes": "",
+      "items": [
+        {
+          "id": 1,
+          "articleId": 4,
+          "nom": "Papier A4 Blanc",
+          "quantite": 100,
+          "prixUnitaire": 4.50,
+          "montant": 450
+        },
+        {
+          "id": 2,
+          "articleId": 6,
+          "nom": "Stylos à bille",
+          "quantite": 50,
+          "prixUnitaire": 3.20,
+          "montant": 160
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "reference": "ACH-003",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "date": "2024-10-01",
+      "dateLivraison": "2024-10-04",
+      "statut": "en_attente",
+      "montantHT": 1500.00,
+      "tva": 300.00,
+      "montantTTC": 1800.00,
+      "notes": "À confirmer",
+      "items": [
+        {
+          "id": 1,
+          "articleId": 5,
+          "nom": "Imprimante HP LaserJet",
+          "quantite": 5,
+          "prixUnitaire": 180,
+          "montant": 900
+        },
+        {
+          "id": 2,
+          "articleId": 3,
+          "nom": "Clavier mécanique",
+          "quantite": 5,
+          "prixUnitaire": 120,
+          "montant": 600
+        }
+      ]
+    }
+  ],
+  "factures": [
+    {
+      "id": 1,
+      "numero": "FAC-2024-001",
+      "fournisseurId": 1,
+      "fournisseur": "TechSupply Corp",
+      "achatId": 1,
+      "date": "2024-10-08",
+      "dateEcheance": "2024-11-08",
+      "montantHT": 2500.00,
+      "tva": 500.00,
+      "montantTTC": 3000.00,
+      "statut": "payee",
+      "datePaiement": "2024-10-10",
+      "notes": "Paiement par virement"
+    },
+    {
+      "id": 2,
+      "numero": "FAC-2024-002",
+      "fournisseurId": 2,
+      "fournisseur": "Bureau Plus SARL",
+      "achatId": 2,
+      "date": "2024-10-06",
+      "dateEcheance": "2024-11-06",
+      "montantHT": 800.00,
+      "tva": 160.00,
+      "montantTTC": 960.00,
+      "statut": "en_attente",
+      "datePaiement": null,
+      "notes": ""
+    },
+    {
+      "id": 3,
+      "numero": "FAC-2024-003",
+      "fournisseurId": 3,
+      "fournisseur": "ElectroMax Industries",
+      "achatId": null,
+      "date": "2024-09-28",
+      "dateEcheance": "2024-10-28",
+      "montantHT": 1200.00,
+      "tva": 240.00,
+      "montantTTC": 1440.00,
+      "statut": "en_retard",
+      "datePaiement": null,
+      "notes": "Relance nécessaire"
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "nom": "Informatique",
+      "description": "Ordinateurs, périphériques et accessoires informatiques",
+      "couleur": "#3B82F6"
+    },
+    {
+      "id": 2,
+      "nom": "Accessoires",
+      "description": "Accessoires informatiques et de bureau",
+      "couleur": "#10B981"
+    },
+    {
+      "id": 3,
+      "nom": "Fournitures",
+      "description": "Fournitures de bureau et consommables",
+      "couleur": "#F59E0B"
+    }
+  ],
+  "statistiques": {
+    "dashboard": {
+      "articlesEnStock": 245,
+      "commandesDuJour": 23,
+      "clientsActifs": 89,
+      "chiffreAffaires": 12450,
+      "tendances": {
+        "articlesEnStock": { "trend": "up", "change": "+12% vs mois dernier" },
+        "commandesDuJour": { "trend": "up", "change": "+8% vs hier" },
+        "clientsActifs": { "trend": "down", "change": "-15% vs mois dernier" },
+        "chiffreAffaires": { "trend": "up", "change": "+23% vs mois dernier" }
+      }
+    },
+    "stock": {
+      "total": 231,
+      "inStock": 200,
+      "outOfStock": 12,
+      "lowStock": 19,      "totalValue": 45680.50
+    },
+    "commandes_fournisseurs": {
+      "total": 156,
+      "enAttente": 23,
+      "livrees": 98,
+      "annulees": 5,
+      "totalValue": 89750.25
+    },
+    "fournisseurs": {
+      "total": 8,
+      "actifs": 6,
+      "inactifs": 1,
+      "suspendus": 1,
+      "totalChiffreAffaires": 413501.55
+    }
+  },
+  "alertes": [
+    {
+      "id": 1,
+      "type": "warning",
+      "titre": "Stock faible",
+      "message": "3 articles en rupture de stock",
+      "date": "2024-10-14",
+      "heure": "Il y a 2h",
+      "lu": false,
+      "priority": "high"    },
+    {
+      "id": 3,
+      "type": "error",
+      "titre": "Facture en retard",
+      "message": "Facture FAC-2024-003 dépasse l'échéance",
+      "date": "2024-10-14",
+      "heure": "Il y a 1h",
+      "lu": true,
+      "priority": "high"
+    }
+  ]
+}
