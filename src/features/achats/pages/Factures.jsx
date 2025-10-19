@@ -9,6 +9,7 @@ import {
   Clock,
   XCircle,
   Eye,
+  Edit,
   Printer,
   FileText,
 } from "lucide-react";
@@ -98,7 +99,8 @@ const Factures = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [factures, setFactures] = useState([]);
-  const [filteredFactures, setFilteredFactures] = useState([]);  const [dateRange, setDateRange] = useState({
+  const [filteredFactures, setFilteredFactures] = useState([]);
+  const [dateRange, setDateRange] = useState({
     from: undefined,
     to: undefined,
   });
@@ -113,14 +115,15 @@ const Factures = () => {
         setFactures(facturesData);
         setFilteredFactures(facturesData);
       } catch (error) {
-        console.error('Error loading factures:', error);
+        console.error("Error loading factures:", error);
       } finally {
         setLoading(false);
       }
     };
 
     loadFactures();
-  }, []);  useEffect(() => {
+  }, []);
+  useEffect(() => {
     // Filter factures based on search term, date range, and status
     let filtered = factures.filter(
       (facture) =>
@@ -152,6 +155,21 @@ const Factures = () => {
     setSelectedFacture(null);
   };
 
+  const handleSaveFacture = async (updatedFacture) => {
+    try {
+      // TODO: Implement update facture service call
+      console.log("Saving updated facture:", updatedFacture);
+      // Reload factures after update
+      const facturesData = await centralDataService.getFactures();
+      setFactures(facturesData);
+      setFilteredFactures(facturesData);
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating facture:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const handleRowClick = (facture) => {
     handleViewFacture(facture);
   };
@@ -178,7 +196,8 @@ const Factures = () => {
     {
       header: "Numéro",
       accessor: "numero",
-    },    {
+    },
+    {
       header: "Fournisseur",
       accessor: "fournisseur",
       cell: (row) => row.fournisseur || "N/A",
@@ -225,7 +244,7 @@ const Factures = () => {
             className="h-8 w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
           >
             <Eye className="h-4 w-4" />
-          </Button>
+          </Button>{" "}
           <Button
             variant="ghost"
             size="sm"
@@ -250,7 +269,8 @@ const Factures = () => {
           </Button>
         </div>
       ),
-    },  ];
+    },
+  ];
 
   return (
     <div className="space-y-8 p-4">
@@ -337,7 +357,8 @@ const Factures = () => {
                     className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
                   >
                     En retard
-                  </SelectItem>                  <SelectItem
+                  </SelectItem>{" "}
+                  <SelectItem
                     value="en_attente"
                     className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
                   >
@@ -363,7 +384,8 @@ const Factures = () => {
               onRowClick={handleRowClick}
               emptyMessage="Aucune facture trouvée. Commencez par ajouter une nouvelle facture."
               rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-            />          </div>
+            />{" "}
+          </div>
         </div>
       </div>
 
@@ -374,24 +396,20 @@ const Factures = () => {
         title="Détail de la Facture"
         size="large"
       >
+        {" "}
         <FactureDetailModal
           facture={selectedFacture}
           onClose={handleCloseFactureModal}
-          onEdit={(facture) => {
-            console.log('Edit facture:', facture);
-            handleCloseFactureModal();
-            // TODO: Implement edit functionality
-          }}
           onDownload={(facture) => {
-            console.log('Download facture:', facture);
+            console.log("Download facture:", facture);
             handleDownloadFacture(facture);
           }}
           onPrint={(facture) => {
-            console.log('Print facture:', facture);
+            console.log("Print facture:", facture);
             handlePrintFacture(facture);
           }}
           onSendEmail={(facture) => {
-            console.log('Send email facture:', facture);
+            console.log("Send email facture:", facture);
             // TODO: Implement email functionality
           }}
         />

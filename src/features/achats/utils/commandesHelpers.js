@@ -1,33 +1,36 @@
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export const formatDate = (dateString) => {
-  if (!dateString) return '';
+  if (!dateString) return "";
   try {
-    return format(new Date(dateString), 'dd/MM/yyyy', { locale: fr });
+    return format(new Date(dateString), "dd/MM/yyyy", { locale: fr });
   } catch (error) {
-    console.error('Erreur de formatage de date:', error);
+    console.error("Erreur de formatage de date:", error);
     return dateString;
   }
 };
 
 export const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(amount);
 };
 
 export const calculateTotalHT = (articles) => {
-  return articles.reduce((sum, article) => sum + (article.prixUnitaireHT * article.quantite), 0);
+  return articles.reduce(
+    (sum, article) => sum + article.prixUnitaireHT * article.quantite,
+    0
+  );
 };
 
 export const calculateTVA = (articles) => {
   return articles.reduce((sum, article) => {
     const montantHT = article.prixUnitaireHT * article.quantite;
-    return sum + (montantHT * (article.tauxTVA / 100));
+    return sum + montantHT * (article.tauxTVA / 100);
   }, 0);
 };
 
@@ -36,21 +39,21 @@ export const calculateTotalTTC = (articles) => {
 };
 
 export const filterCommandes = (commandes, filters) => {
-  return commandes.filter(commande => {
+  return commandes.filter((commande) => {
     // Filtre par recherche
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         commande.id.toLowerCase().includes(searchTerm) ||
         commande.fournisseur.toLowerCase().includes(searchTerm) ||
-        commande.articles.some(article => 
+        commande.articles.some((article) =>
           article.nom.toLowerCase().includes(searchTerm)
         );
       if (!matchesSearch) return false;
     }
 
     // Filtre par statut
-    if (filters.statut && filters.statut !== 'all') {
+    if (filters.statut && filters.statut !== "all") {
       if (commande.statut !== filters.statut) return false;
     }
 
@@ -88,28 +91,28 @@ export const sortCommandes = (commandes, sortConfig) => {
     let bValue = b[sortConfig.key];
 
     // Gestion spéciale pour les dates
-    if (sortConfig.key === 'date') {
+    if (sortConfig.key === "date") {
       aValue = new Date(aValue);
       bValue = new Date(bValue);
     }
 
     // Gestion spéciale pour les montants
-    if (sortConfig.key.includes('total') || sortConfig.key === 'tva') {
+    if (sortConfig.key.includes("total") || sortConfig.key === "tva") {
       aValue = parseFloat(aValue) || 0;
       bValue = parseFloat(bValue) || 0;
     }
 
     // Gestion spéciale pour les strings
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
+    if (typeof aValue === "string" && typeof bValue === "string") {
       aValue = aValue.toLowerCase();
       bValue = bValue.toLowerCase();
     }
 
     if (aValue < bValue) {
-      return sortConfig.direction === 'asc' ? -1 : 1;
+      return sortConfig.direction === "asc" ? -1 : 1;
     }
     if (aValue > bValue) {
-      return sortConfig.direction === 'asc' ? 1 : -1;
+      return sortConfig.direction === "asc" ? 1 : -1;
     }
     return 0;
   });
@@ -117,34 +120,34 @@ export const sortCommandes = (commandes, sortConfig) => {
 
 export const getCommandeStatusColor = (statut) => {
   switch (statut) {
-    case 'payé':
-      return 'text-green-600 bg-green-100';
-    case 'en attente':
-      return 'text-orange-600 bg-orange-100';
-    case 'annulé':
-      return 'text-red-600 bg-red-100';
+    case "payé":
+      return "text-green-600 bg-green-100";
+    case "en attente":
+      return "text-orange-600 bg-orange-100";
+    case "annulé":
+      return "text-red-600 bg-red-100";
     default:
-      return 'text-gray-600 bg-gray-100';
+      return "text-gray-600 bg-gray-100";
   }
 };
 
 export const validateCommandeData = (commandeData) => {
   const errors = {};
 
-  if (!commandeData.fournisseur || commandeData.fournisseur.trim() === '') {
-    errors.fournisseur = 'Le fournisseur est requis';
+  if (!commandeData.fournisseur || commandeData.fournisseur.trim() === "") {
+    errors.fournisseur = "Le fournisseur est requis";
   }
 
   if (!commandeData.date) {
-    errors.date = 'La date est requise';
+    errors.date = "La date est requise";
   }
 
   if (!commandeData.articles || commandeData.articles.length === 0) {
-    errors.articles = 'Au moins un article est requis';
+    errors.articles = "Au moins un article est requis";
   }
 
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
   };
 };

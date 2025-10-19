@@ -22,13 +22,21 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import { STATUT_FACTURE } from "../../features/achats/pages/Factures";
 
-export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPrint, onSendEmail }) {
+export function FactureDetailModal({
+  facture,
+  onClose,
+  onEdit,
+  onDownload,
+  onPrint,
+  onSendEmail,
+}) {
   if (!facture) return null;
 
   const getStatusBadge = (status, dateEcheance) => {
     const isLate =
       status === STATUT_FACTURE.EN_RETARD ||
-      (status !== STATUT_FACTURE.PAYEE && new Date(dateEcheance) < new Date());    if (isLate) {
+      (status !== STATUT_FACTURE.PAYEE && new Date(dateEcheance) < new Date());
+    if (isLate) {
       return (
         <Badge
           variant="secondary"
@@ -92,8 +100,15 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
     }
   };
 
-  const isOverdue = facture.dateEcheance && new Date(facture.dateEcheance) < new Date() && facture.statut !== STATUT_FACTURE.PAYEE;
-  const daysOverdue = isOverdue ? Math.floor((new Date() - new Date(facture.dateEcheance)) / (1000 * 60 * 60 * 24)) : 0;
+  const isOverdue =
+    facture.dateEcheance &&
+    new Date(facture.dateEcheance) < new Date() &&
+    facture.statut !== STATUT_FACTURE.PAYEE;
+  const daysOverdue = isOverdue
+    ? Math.floor(
+        (new Date() - new Date(facture.dateEcheance)) / (1000 * 60 * 60 * 24)
+      )
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -111,7 +126,7 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
             {facture.dateEcheance && (
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
-                <span className={isOverdue ? 'text-[var(--color-error)]' : ''}>
+                <span className={isOverdue ? "text-[var(--color-error)]" : ""}>
                   Échéance le {formatDate(facture.dateEcheance)}
                   {isOverdue && ` (${daysOverdue} jours de retard)`}
                 </span>
@@ -122,7 +137,8 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
         <div className="flex items-center gap-2">
           {getStatusBadge(facture.statut, facture.dateEcheance)}
         </div>
-      </div>      {/* Actions */}
+      </div>{" "}
+      {/* Actions */}
       <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200/50">
         <Button
           variant="outline"
@@ -161,7 +177,6 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
           Envoyer par email
         </Button>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         {/* Informations Fournisseur */}
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -180,7 +195,7 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
                 {facture.fournisseur || "Non spécifié"}
               </p>
             </div>
-            
+
             {facture.fournisseurDetails && (
               <>
                 {facture.fournisseurDetails.adresse && (
@@ -193,7 +208,7 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
                     </p>
                   </div>
                 )}
-                
+
                 {facture.fournisseurDetails.siret && (
                   <div>
                     <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
@@ -220,35 +235,46 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
           <CardContent className="space-y-3">
             {facture.modePaiement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Mode de paiement</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Mode de paiement
+                </span>
                 <span className="font-medium">{facture.modePaiement}</span>
               </div>
             )}
-            
+
             {facture.delaiPaiement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Délai de paiement</span>
-                <span className="font-medium">{facture.delaiPaiement} jours</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Délai de paiement
+                </span>
+                <span className="font-medium">
+                  {facture.delaiPaiement} jours
+                </span>
               </div>
             )}
 
             {facture.datePaiement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Date de paiement</span>
-                <span className="font-medium">{formatDate(facture.datePaiement)}</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Date de paiement
+                </span>
+                <span className="font-medium">
+                  {formatDate(facture.datePaiement)}
+                </span>
               </div>
             )}
 
             {facture.referenceVirement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Référence virement</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Référence virement
+                </span>
                 <span className="font-medium">{facture.referenceVirement}</span>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
-
       {/* Détail Financier */}
       <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
         <CardHeader className="pb-3">
@@ -259,27 +285,39 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-[var(--color-foreground-muted)]">Montant HT</span>
-            <span className="font-medium">{formatCurrency(facture.montantHT || 0)}</span>
+            <span className="text-sm text-[var(--color-foreground-muted)]">
+              Montant HT
+            </span>
+            <span className="font-medium">
+              {formatCurrency(facture.montantHT || 0)}
+            </span>
           </div>
-          
+
           <div className="flex justify-between items-center">
-            <span className="text-sm text-[var(--color-foreground-muted)]">TVA ({facture.tauxTVA || 20}%)</span>
-            <span className="font-medium">{formatCurrency(facture.montantTVA || 0)}</span>
+            <span className="text-sm text-[var(--color-foreground-muted)]">
+              TVA ({facture.tauxTVA || 20}%)
+            </span>
+            <span className="font-medium">
+              {formatCurrency(facture.montantTVA || 0)}
+            </span>
           </div>
-          
+
           {facture.remise && facture.remise > 0 && (
             <div className="flex justify-between items-center text-[var(--color-success)]">
               <span className="text-sm">Remise</span>
-              <span className="font-medium">-{formatCurrency(facture.remise)}</span>
+              <span className="font-medium">
+                -{formatCurrency(facture.remise)}
+              </span>
             </div>
           )}
-          
+
           <div className="border-t border-[var(--color-border)] pt-3">
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold">Total TTC</span>
               <span className="text-xl font-bold text-[var(--color-blue)]">
-                {formatCurrency(facture.montantTTC || facture.montantTotal || 0)}
+                {formatCurrency(
+                  facture.montantTTC || facture.montantTotal || 0
+                )}
               </span>
             </div>
           </div>
@@ -288,19 +326,23 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
             <>
               <div className="flex justify-between items-center text-[var(--color-warning)]">
                 <span className="text-sm">Acompte versé</span>
-                <span className="font-medium">-{formatCurrency(facture.acompte)}</span>
+                <span className="font-medium">
+                  -{formatCurrency(facture.acompte)}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-medium">Reste à payer</span>
                 <span className="font-bold text-[var(--color-error)]">
-                  {formatCurrency((facture.montantTTC || facture.montantTotal || 0) - facture.acompte)}
+                  {formatCurrency(
+                    (facture.montantTTC || facture.montantTotal || 0) -
+                      facture.acompte
+                  )}
                 </span>
               </div>
             </>
           )}
         </CardContent>
       </Card>
-
       {/* Articles/Services */}
       {facture.lignes && facture.lignes.length > 0 && (
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -339,7 +381,9 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
                       <span>{formatCurrency(ligne.prixUnitaire || 0)}</span>
                     </div>
                     <div className="text-base font-medium text-[var(--color-blue)]">
-                      {formatCurrency((ligne.quantite || 1) * (ligne.prixUnitaire || 0))}
+                      {formatCurrency(
+                        (ligne.quantite || 1) * (ligne.prixUnitaire || 0)
+                      )}
                     </div>
                   </div>
                 </div>
@@ -348,7 +392,6 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
           </CardContent>
         </Card>
       )}
-
       {/* Commande associée */}
       {facture.commandeReference && (
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -382,7 +425,6 @@ export function FactureDetailModal({ facture, onClose, onEdit, onDownload, onPri
           </CardContent>
         </Card>
       )}
-
       {/* Notes */}
       {facture.notes && (
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">

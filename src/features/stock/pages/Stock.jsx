@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Package, Search, Filter } from "lucide-react";
+import { Upload } from "lucide-react";
 import { StockStats } from "../components/StockStats";
 import { StockTable } from "../components/StockTable";
 import { AddProductForm } from "../components/AddProductForm";
@@ -17,27 +18,33 @@ import { useStock, useStockStats, useStockFilters } from "../hooks/useStock";
 import { STOCK_CATEGORIES, SORT_OPTIONS } from "../utils/constants";
 import { getFilterOptions } from "../utils/stockHelpers";
 import { DetailModal, StockDetailModal } from "@/components/modals";
+import stockAdjustmentService from "../services/stockAdjustmentService";
+import ImportStockModal from "../components/ImportStockModal";
 
 export default function Stock() {
-  const { stockItems, loading, error, addStockItem } = useStock();
+  const { stockItems, loading, error, addStockItem, setStockItems } =
+    useStock();
   const { stats, loading: statsLoading } = useStockStats();
   const { filters, filteredItems, updateFilter, resetFilters } =
     useStockFilters(stockItems);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showStockModal, setShowStockModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const handleSort = (column) => {
     const newSortOrder =
       filters.sortBy === column && filters.sortOrder === "asc" ? "desc" : "asc";
-    updateFilter("sortBy", column);    updateFilter("sortOrder", newSortOrder);
+    updateFilter("sortBy", column);
+    updateFilter("sortOrder", newSortOrder);
   };
 
   const handleStockItemClick = (item) => {
     setSelectedItem(item);
     setShowStockModal(true);
   };
-
   const handleCloseStockModal = () => {
     setShowStockModal(false);
     setSelectedItem(null);
@@ -75,14 +82,25 @@ export default function Stock() {
             Gérez votre inventaire et suivez vos stocks en temps réel
           </p>
         </div>
-        <Button
-          size="sm"
-          className="ml-2 bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
-          onClick={() => setIsAddProductOpen(true)}
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Ajouter un Article
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-2 border-[var(--color-border)]"
+            onClick={() => setIsImportOpen(true)}
+          >
+            <Upload className="h-4 w-4 mr-1" />
+            Importer du stock
+          </Button>
+          <Button
+            size="sm"
+            className="ml-2 bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
+            onClick={() => setIsAddProductOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Ajouter un Article
+          </Button>
+        </div>
       </div>{" "}
       {/* Statistiques */}
       <StockStats stats={stats} loading={statsLoading} />
@@ -196,14 +214,23 @@ export default function Stock() {
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">        <StockTable
-          stockItems={filteredItems}
-          loading={loading}
-          onSort={handleSort}
-          sortBy={filters.sortBy}
-          sortOrder={filters.sortOrder}
-          onRowClick={handleStockItemClick}
-        />
+          <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
+            {" "}
+            <StockTable
+              stockItems={filteredItems}
+              loading={loading}
+              onSort={handleSort}
+              sortBy={filters.sortBy}
+              sortOrder={filters.sortOrder}
+              onRowClick={handleStockItemClick}
+              page={page}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(n) => {
+                setPageSize(n);
+                setPage(1);
+              }}
+            />
           </div>
         )}
       </div>
@@ -267,7 +294,8 @@ export default function Stock() {
             </div>
           </div>
         </CardContent>
-      </Card>      {/* Add Product Form Modal */}
+      </Card>{" "}
+      {/* Add Product Form Modal */}
       <AddProductForm
         isOpen={isAddProductOpen}
         onClose={() => setIsAddProductOpen(false)}
@@ -280,8 +308,7 @@ export default function Stock() {
             // You might want to show an error toast here
           }
         }}
-      />
-
+      />{" "}
       {/* Stock Detail Modal */}
       <DetailModal
         isOpen={showStockModal}
@@ -289,20 +316,18 @@ export default function Stock() {
         title="Détail de l'Article"
         size="large"
       >
+        {" "}
         <StockDetailModal
           item={selectedItem}
           onClose={handleCloseStockModal}
-          onEdit={(item) => {
-            console.log('Edit item:', item);
-            handleCloseStockModal();
-            // TODO: Implement edit functionality
-          }}
-          onAdjustStock={(item, type) => {
-            console.log('Adjust stock:', item, type);
-            // TODO: Implement stock adjustment functionality
-          }}
+          showAdjustments={false}
         />
-      </DetailModal>
+      </DetailModal>{" "}
+      {/* Import Stock Modal */}
+      <ImportStockModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+      />
     </div>
   );
 }

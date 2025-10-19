@@ -36,7 +36,8 @@ export default function Dashboard() {
   // State for filters and data
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [recentOrders, setRecentOrders] = useState([]);  const [alerts, setAlertes] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [alerts, setAlertes] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCommande, setSelectedCommande] = useState(null);
@@ -50,14 +51,14 @@ export default function Dashboard() {
         const [ordersData, alertsData, statsData] = await Promise.all([
           centralDataService.getRecentOrders(5),
           centralDataService.getAlertes(),
-          centralDataService.getDashboardStats()
+          centralDataService.getDashboardStats(),
         ]);
-        
+
         setRecentOrders(ordersData);
         setAlertes(alertsData);
         setDashboardStats(statsData);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setLoading(false);
       }
@@ -76,7 +77,9 @@ export default function Dashboard() {
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       trend: dashboardStats?.tendances?.articlesEnStock?.trend || "up",
-      change: dashboardStats?.tendances?.articlesEnStock?.change || "+12% vs mois dernier",
+      change:
+        dashboardStats?.tendances?.articlesEnStock?.change ||
+        "+12% vs mois dernier",
     },
     {
       title: "Commandes du Jour",
@@ -87,7 +90,8 @@ export default function Dashboard() {
       bgColor: "bg-green-50",
       borderColor: "border-green-200",
       trend: dashboardStats?.tendances?.commandesDuJour?.trend || "up",
-      change: dashboardStats?.tendances?.commandesDuJour?.change || "+8% vs hier",
+      change:
+        dashboardStats?.tendances?.commandesDuJour?.change || "+8% vs hier",
     },
     {
       title: "Clients Actifs",
@@ -98,31 +102,38 @@ export default function Dashboard() {
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200",
       trend: dashboardStats?.tendances?.clientsActifs?.trend || "down",
-      change: dashboardStats?.tendances?.clientsActifs?.change || "-15% vs mois dernier",
+      change:
+        dashboardStats?.tendances?.clientsActifs?.change ||
+        "-15% vs mois dernier",
     },
     {
       title: "Chiffre d'Affaires",
-      value: `€${dashboardStats?.chiffreAffaires?.toLocaleString('fr-FR') || "12,450"}`,
+      value: `€${dashboardStats?.chiffreAffaires?.toLocaleString("fr-FR") || "12,450"}`,
       icon: TrendingUp,
       description: "CA du mois en cours",
       color: "var(--color-orange)",
       bgColor: "bg-orange-50",
       borderColor: "border-orange-200",
       trend: dashboardStats?.tendances?.chiffreAffaires?.trend || "up",
-      change: dashboardStats?.tendances?.chiffreAffaires?.change || "+23% vs mois dernier",
+      change:
+        dashboardStats?.tendances?.chiffreAffaires?.change ||
+        "+23% vs mois dernier",
     },
-  ];  // Filter orders based on search and status
+  ]; // Filter orders based on search and status
   const filteredOrders = useMemo(() => {
     return recentOrders.filter((order) => {
       const matchesSearch =
         !searchTerm ||
-        (order.reference || `CMD-${order.id.toString().padStart(4, "0")}`).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.reference || `CMD-${order.id.toString().padStart(4, "0")}`)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         order.fournisseur.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
         !statusFilter ||
         statusFilter === "all" ||
-        order.statut === statusFilter;      return matchesSearch && matchesStatus;
+        order.statut === statusFilter;
+      return matchesSearch && matchesStatus;
     });
   }, [recentOrders, searchTerm, statusFilter]);
 
@@ -286,7 +297,9 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
-          <Table>            <TableHeader>
+          <Table>
+            {" "}
+            <TableHeader>
               <TableRow>
                 <TableHead>Référence</TableHead>
                 <TableHead>Fournisseur</TableHead>
@@ -294,16 +307,22 @@ export default function Dashboard() {
                 <TableHead>Statut</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
-            </TableHeader>            <TableBody>
+            </TableHeader>{" "}
+            <TableBody>
               {filteredOrders.map((order) => (
-                <TableRow 
+                <TableRow
                   key={order.id}
                   className="cursor-pointer hover:bg-[var(--color-background)] transition-colors"
                   onClick={() => handleCommandeClick(order)}
                 >
-                  <TableCell className="font-medium">{order.reference || `CMD-${order.id.toString().padStart(4, "0")}`}</TableCell>
+                  <TableCell className="font-medium">
+                    {order.reference ||
+                      `CMD-${order.id.toString().padStart(4, "0")}`}
+                  </TableCell>
                   <TableCell>{order.fournisseur}</TableCell>
-                  <TableCell>€{(order.montantTTC || order.montantTotal || 0).toFixed(2)}</TableCell>
+                  <TableCell>
+                    €{(order.montantTTC || order.montantTotal || 0).toFixed(2)}
+                  </TableCell>
                   <TableCell>{getStatusBadge(order.statut)}</TableCell>
                   <TableCell>{order.date}</TableCell>
                 </TableRow>
@@ -321,47 +340,66 @@ export default function Dashboard() {
           {alerts.map((alert, index) => {
             const getAlertIcon = (type) => {
               switch (type) {
-                case 'warning': return AlertTriangle;
-                case 'error': return XCircle;
-                case 'info': return CheckCircle2;
-                default: return AlertTriangle;
+                case "warning":
+                  return AlertTriangle;
+                case "error":
+                  return XCircle;
+                case "info":
+                  return CheckCircle2;
+                default:
+                  return AlertTriangle;
               }
             };
 
             const getAlertColor = (type) => {
               switch (type) {
-                case 'warning': return 'text-[var(--color-orange)]';
-                case 'error': return 'text-[var(--color-red)]';
-                case 'info': return 'text-[var(--color-blue)]';
-                default: return 'text-[var(--color-orange)]';
+                case "warning":
+                  return "text-[var(--color-orange)]";
+                case "error":
+                  return "text-[var(--color-red)]";
+                case "info":
+                  return "text-[var(--color-blue)]";
+                default:
+                  return "text-[var(--color-orange)]";
               }
-            };            const getAlertBgColor = (type) => {
+            };
+            const getAlertBgColor = (type) => {
               switch (type) {
-                case 'warning': return 'bg-[var(--color-orange)]/10';
-                case 'error': return 'bg-[var(--color-red)]/10';
-                case 'info': return 'bg-[var(--color-blue)]/10';
-                default: return 'bg-[var(--color-orange)]/10';
+                case "warning":
+                  return "bg-[var(--color-orange)]/10";
+                case "error":
+                  return "bg-[var(--color-red)]/10";
+                case "info":
+                  return "bg-[var(--color-blue)]/10";
+                default:
+                  return "bg-[var(--color-orange)]/10";
               }
             };
 
             const getAlertBorderColor = (type) => {
               switch (type) {
-                case 'warning': return 'border-orange-200';
-                case 'error': return 'border-red-200';
-                case 'info': return 'border-blue-200';
-                default: return 'border-orange-200';
+                case "warning":
+                  return "border-orange-200";
+                case "error":
+                  return "border-red-200";
+                case "info":
+                  return "border-blue-200";
+                default:
+                  return "border-orange-200";
               }
             };
 
             const Icon = getAlertIcon(alert.type);
-            
+
             return (
               <div
                 key={index}
                 className={`p-4 rounded-lg ${getAlertBgColor(alert.type)} ${getAlertBorderColor(alert.type)} border`}
               >
                 <div className="flex items-start space-x-3">
-                  <Icon className={`h-5 w-5 mt-0.5 ${getAlertColor(alert.type)}`} />
+                  <Icon
+                    className={`h-5 w-5 mt-0.5 ${getAlertColor(alert.type)}`}
+                  />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
                       {alert.titre}
@@ -376,9 +414,9 @@ export default function Dashboard() {
                 </div>
               </div>
             );
-          })}        </div>
+          })}{" "}
+        </div>
       </div>
-
       {/* Commande Detail Modal */}
       <DetailModal
         isOpen={showCommandeModal}
@@ -390,11 +428,11 @@ export default function Dashboard() {
           commande={selectedCommande}
           onClose={handleCloseCommandeModal}
           onEdit={(commande) => {
-            console.log('Edit commande:', commande);
+            console.log("Edit commande:", commande);
             // TODO: Implement edit functionality
           }}
           onDownload={(commande) => {
-            console.log('Download commande:', commande);
+            console.log("Download commande:", commande);
             // TODO: Implement download functionality
           }}
         />

@@ -13,6 +13,7 @@ import {
   Clock,
   XCircle,
   Eye,
+  Edit,
   Trash2,
 } from "lucide-react";
 import { format, subDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
@@ -47,7 +48,8 @@ import { STATUT_COMMANDE, STATUT_COMMANDE_OPTIONS } from "../utils/constants";
 import { DetailModal, CommandeDetailModal } from "@/components/modals";
 
 export const Commandes = () => {
-  const navigate = useNavigate();  const [showFilters, setShowFilters] = useState(true);
+  const navigate = useNavigate();
+  const [showFilters, setShowFilters] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCommande, setSelectedCommande] = useState(null);
   const [showCommandeModal, setShowCommandeModal] = useState(false);
@@ -113,7 +115,8 @@ export const Commandes = () => {
     {
       header: "Statut",
       accessor: "statut",
-      cell: (row) => {        switch (row.statut) {
+      cell: (row) => {
+        switch (row.statut) {
           case STATUT_COMMANDE.PAYE:
             return (
               <Badge
@@ -157,17 +160,19 @@ export const Commandes = () => {
         <div className="flex justify-end gap-2">
           <Button
             variant="ghost"
-            size="sm"            onClick={(e) => {
+            size="sm"
+            onClick={(e) => {
               e.stopPropagation();
               navigate(`/commandes/${row.id}`);
             }}
             className="h-8 w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
           >
             <Eye className="h-4 w-4" />
-          </Button>
+          </Button>{" "}
           <Button
             variant="ghost"
-            size="sm"            onClick={(e) => {
+            size="sm"
+            onClick={(e) => {
               e.stopPropagation();
               handleDeleteCommande(row);
             }}
@@ -178,19 +183,31 @@ export const Commandes = () => {
         </div>
       ),
     },
-  ];  // Gestion du clic sur une ligne
+  ]; // Gestion du clic sur une ligne
   const handleRowClick = (commande) => {
     setSelectedCommande(commande);
     setShowCommandeModal(true);
   };
-
   const handleCloseCommandeModal = () => {
     setShowCommandeModal(false);
     setSelectedCommande(null);
   };
+
+  const handleSaveCommande = async (updatedCommande) => {
+    try {
+      // TODO: Implement update commande service call
+      console.log("Saving updated commande:", updatedCommande);
+      await refreshData();
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating commande:", error);
+      return { success: false, error: error.message };
+    }
+  };
   // Filter commandes based on search and filters
   const filteredCommandes = useMemo(() => {
-    return commandes.filter((commande) => {      // Search term filter
+    return commandes.filter((commande) => {
+      // Search term filter
       const searchTerm = filters.search || "";
       const matchesSearch =
         !searchTerm ||
@@ -209,7 +226,8 @@ export const Commandes = () => {
         !filters.dateFrom ||
         !filters.dateTo ||
         !commandeDate ||
-        (commandeDate >= new Date(filters.dateFrom) &&          commandeDate <= new Date(filters.dateTo));
+        (commandeDate >= new Date(filters.dateFrom) &&
+          commandeDate <= new Date(filters.dateTo));
 
       // Amount range filter
       const amount = parseFloat(commande.montantTotal || 0);
@@ -217,17 +235,14 @@ export const Commandes = () => {
       const maxAmount =
         parseFloat(filters.montantMax || Number.MAX_SAFE_INTEGER) ||
         Number.MAX_SAFE_INTEGER;
-      const matchesAmount = amount >= minAmount && amount <= maxAmount;      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesDate &&
-        matchesAmount
-      );
+      const matchesAmount = amount >= minAmount && amount <= maxAmount;
+      return matchesSearch && matchesStatus && matchesDate && matchesAmount;
     });
   }, [commandes, filters]);
 
   if (error) {
-    return (      <div className="space-y-8 p-4">
+    return (
+      <div className="space-y-8 p-4">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold text-[var(--color-foreground)]">
             Gestion des Commandes
@@ -254,7 +269,9 @@ export const Commandes = () => {
   return (
     <div className="space-y-8 p-4">
       {/* En-tête de la page */}
-      <div className="flex items-center justify-between">        <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        {" "}
+        <div className="space-y-1">
           <h1 className="text-xl font-semibold text-[var(--color-foreground)]">
             Gestion des Commandes
           </h1>
@@ -279,11 +296,14 @@ export const Commandes = () => {
             size="sm"
             onClick={() => setShowAddForm(true)}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
-          >            <Plus className="h-4 w-4 mr-1" />
+          >
+            {" "}
+            <Plus className="h-4 w-4 mr-1" />
             Nouvelle Commande
           </Button>
         </div>
-      </div>      {/* Statistiques */}
+      </div>{" "}
+      {/* Statistiques */}
       <CommandesStats stats={stats} /> {/* Liste des Commandes */}
       <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
         <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
@@ -330,7 +350,8 @@ export const Commandes = () => {
                   >
                     {option.label}
                   </SelectItem>
-                ))}              </SelectContent>
+                ))}{" "}
+              </SelectContent>
             </Select>
           </div>
         </div>
@@ -343,15 +364,15 @@ export const Commandes = () => {
           emptyMessage="Aucune commande trouvée. Commencez par ajouter une nouvelle commande."
           rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
         />
-      </div>      {/* Formulaire d'ajout */}
+      </div>{" "}
+      {/* Formulaire d'ajout */}
       {showAddForm && (
         <AddCommandeForm
           open={showAddForm}
           onOpenChange={setShowAddForm}
           onSubmit={handleAddCommande}
         />
-      )}
-
+      )}{" "}
       {/* Commande Detail Modal */}
       <DetailModal
         isOpen={showCommandeModal}
@@ -359,16 +380,12 @@ export const Commandes = () => {
         title="Détail de la Commande"
         size="large"
       >
+        {" "}
         <CommandeDetailModal
           commande={selectedCommande}
           onClose={handleCloseCommandeModal}
-          onEdit={(commande) => {
-            console.log('Edit commande:', commande);
-            handleCloseCommandeModal();
-            // TODO: Implement edit functionality
-          }}
           onDownload={(commande) => {
-            console.log('Download commande:', commande);
+            console.log("Download commande:", commande);
             // TODO: Implement download functionality
           }}
         />

@@ -5,6 +5,8 @@ import AppLayout from "@/components/layout/AppLayout";
 // Lazy load feature components
 const Dashboard = lazy(() => import("@/features/dashboard/pages/Dashboard"));
 const Stock = lazy(() => import("@/features/stock/pages/Stock"));
+const StockEntrees = lazy(() => import("@/features/stock/pages/StockEntrees"));
+const StockSorties = lazy(() => import("@/features/stock/pages/StockSorties"));
 const Commandes = lazy(() => import("@/features/achats/pages/Achats"));
 const Factures = lazy(() => import("@/features/achats/pages/Factures"));
 const Fournisseurs = lazy(
@@ -26,6 +28,8 @@ const AppRoutes = () => {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="stock" element={<Stock />} />
+          <Route path="stock/entrees" element={<StockEntrees />} />
+          <Route path="stock/sorties" element={<StockSorties />} />
           <Route path="commandes">
             <Route index element={<Commandes />} />
             <Route path="factures" element={<Factures />} />

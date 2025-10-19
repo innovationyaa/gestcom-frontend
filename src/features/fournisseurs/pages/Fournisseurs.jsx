@@ -32,7 +32,8 @@ import { useFournisseurs } from "../hooks/useFournisseurs";
 import { DetailModal, FournisseurDetailModal } from "@/components/modals";
 
 export const Fournisseurs = () => {
-  const navigate = useNavigate();  const [showAddForm, setShowAddForm] = useState(false);
+  const navigate = useNavigate();
+  const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -88,14 +89,21 @@ export const Fournisseurs = () => {
     setSelectedFournisseur(fournisseur);
     setShowFournisseurModal(true);
   };
-
   const handleCloseFournisseurModal = () => {
     setShowFournisseurModal(false);
     setSelectedFournisseur(null);
   };
 
-  const handleEditFournisseur = (fournisseur) => {
-    navigate(`/fournisseurs/${fournisseur.id}/edit`);
+  const handleSaveFournisseur = async (updatedFournisseur) => {
+    try {
+      // TODO: Implement update fournisseur service call
+      console.log("Saving updated fournisseur:", updatedFournisseur);
+      await refreshData();
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating fournisseur:", error);
+      return { success: false, error: error.message };
+    }
   };
 
   const getStatusBadge = (statut) => {
@@ -217,18 +225,7 @@ export const Fournisseurs = () => {
             }}
             className="h-8 w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
           >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEditFournisseur(row);
-            }}
-            className="h-8 w-8 p-0 hover:bg-[var(--color-warning)] hover:bg-opacity-10 hover:text-[var(--color-warning)]"
-          >
-            <Edit className="h-4 w-4" />
+            <Eye className="h-4 w-4" />{" "}
           </Button>
           <Button
             variant="ghost"
@@ -302,10 +299,8 @@ export const Fournisseurs = () => {
           </Button>
         </div>
       </div>
-
       {/* Statistics */}
       <FournisseursStats stats={stats} />
-
       {/* Liste des Fournisseurs */}
       <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
         <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
@@ -406,15 +401,14 @@ export const Fournisseurs = () => {
           />
         </div>
       </div>
-
-      {/* Add Form */}      {showAddForm && (
+      {/* Add Form */}{" "}
+      {showAddForm && (
         <AddFournisseurForm
           open={showAddForm}
           onOpenChange={setShowAddForm}
           onSubmit={handleAddFournisseur}
         />
       )}
-
       {/* Fournisseur Detail Modal */}
       <DetailModal
         isOpen={showFournisseurModal}
@@ -422,16 +416,12 @@ export const Fournisseurs = () => {
         title="Détail du Fournisseur"
         size="large"
       >
+        {" "}
         <FournisseurDetailModal
           fournisseur={selectedFournisseur}
           onClose={handleCloseFournisseurModal}
-          onEdit={(fournisseur) => {
-            console.log('Edit fournisseur:', fournisseur);
-            handleCloseFournisseurModal();
-            handleEditFournisseur(fournisseur);
-          }}
           onContact={(fournisseur) => {
-            console.log('Contact fournisseur:', fournisseur);
+            console.log("Contact fournisseur:", fournisseur);
             // TODO: Implement contact functionality
           }}
         />

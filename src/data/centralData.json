@@ -17,7 +17,7 @@
       "dateCreation": "2023-01-15",
       "derniereCommande": "2024-10-10",
       "totalCommandes": 12,
-      "chiffreAffaires": 2580.50
+      "chiffreAffaires": 2580.5
     },
     {
       "id": 2,
@@ -29,7 +29,7 @@
       "dateCreation": "2023-02-20",
       "derniereCommande": "2024-10-09",
       "totalCommandes": 8,
-      "chiffreAffaires": 1890.00
+      "chiffreAffaires": 1890.0
     },
     {
       "id": 3,
@@ -53,7 +53,7 @@
       "dateCreation": "2023-04-05",
       "derniereCommande": "2024-10-08",
       "totalCommandes": 4,
-      "chiffreAffaires": 680.20
+      "chiffreAffaires": 680.2
     },
     {
       "id": 5,
@@ -65,7 +65,7 @@
       "dateCreation": "2023-05-12",
       "derniereCommande": "2024-10-07",
       "totalCommandes": 3,
-      "chiffreAffaires": 450.90
+      "chiffreAffaires": 450.9
     }
   ],
   "fournisseurs": [
@@ -85,7 +85,7 @@
       "dateCreation": "2023-01-15",
       "derniereCommande": "2024-10-10",
       "totalCommandes": 25,
-      "chiffreAffaires": 125000.50
+      "chiffreAffaires": 125000.5
     },
     {
       "id": 2,
@@ -121,7 +121,7 @@
       "dateCreation": "2022-11-05",
       "derniereCommande": "2024-10-05",
       "totalCommandes": 35,
-      "chiffreAffaires": 198750.80
+      "chiffreAffaires": 198750.8
     }
   ],
   "stock": [
@@ -134,12 +134,54 @@
       "prixAchat": 800,
       "prixVente": 1200,
       "seuilMinimum": 5,
+      "seuilMaximum": 50,
       "uniteMesure": "pièces",
       "categorie": "Informatique",
       "fournisseurId": 1,
       "fournisseur": "TechSupply Corp",
+      "emplacement": "A1-B2",
+      "delaiLivraison": 7,
+      "dernierAchat": "2024-10-01",
       "dateCreation": "2024-01-15",
-      "dateModification": "2024-10-01"
+      "dateModification": "2024-10-01",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-14T15:30:00",
+          "type": "sortie",
+          "quantity": 2,
+          "reason": "Vente",
+          "reference": "ORD-002",
+          "user": "Marie Martin",
+          "stockBefore": 27,
+          "stockAfter": 25,
+          "notes": "Vente client entreprise"
+        },
+        {
+          "id": 2,
+          "date": "2024-10-01T09:15:00",
+          "type": "entree",
+          "quantity": 10,
+          "reason": "Réception commande",
+          "reference": "ACH-001",
+          "user": "Pierre Durand",
+          "stockBefore": 17,
+          "stockAfter": 27,
+          "notes": "Livraison fournisseur TechSupply"
+        },
+        {
+          "id": 3,
+          "date": "2024-09-28T11:20:00",
+          "type": "sortie",
+          "quantity": 3,
+          "reason": "Vente",
+          "reference": "ORD-001",
+          "user": "Jean Dupont",
+          "stockBefore": 20,
+          "stockAfter": 17,
+          "notes": "Commande client particulier"
+        }
+      ]
     },
     {
       "id": 2,
@@ -150,12 +192,54 @@
       "prixAchat": 25,
       "prixVente": 45,
       "seuilMinimum": 10,
+      "seuilMaximum": 50,
       "uniteMesure": "pièces",
       "categorie": "Accessoires",
       "fournisseurId": 1,
       "fournisseur": "TechSupply Corp",
+      "emplacement": "B2-C1",
+      "delaiLivraison": 5,
+      "dernierAchat": "2024-09-28",
       "dateCreation": "2024-02-10",
-      "dateModification": "2024-09-28"
+      "dateModification": "2024-09-28",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-10T14:45:00",
+          "type": "sortie",
+          "quantity": 2,
+          "reason": "Vente",
+          "reference": "ORD-001",
+          "user": "Jean Dupont",
+          "stockBefore": 5,
+          "stockAfter": 3,
+          "notes": "Vente accompagnée d'ordinateur"
+        },
+        {
+          "id": 2,
+          "date": "2024-09-28T10:30:00",
+          "type": "entree",
+          "quantity": 15,
+          "reason": "Réception commande",
+          "reference": "ACH-001",
+          "user": "Marie Martin",
+          "stockBefore": -10,
+          "stockAfter": 5,
+          "notes": "Réapprovisionnement suite rupture"
+        },
+        {
+          "id": 3,
+          "date": "2024-09-15T16:00:00",
+          "type": "sortie",
+          "quantity": 12,
+          "reason": "Vente",
+          "reference": "ORD-BULK-001",
+          "user": "Sophie Lambert",
+          "stockBefore": 2,
+          "stockAfter": -10,
+          "notes": "Commande importante entreprise"
+        }
+      ]
     },
     {
       "id": 3,
@@ -166,12 +250,54 @@
       "prixAchat": 120,
       "prixVente": 180,
       "seuilMinimum": 5,
+      "seuilMaximum": 25,
       "uniteMesure": "pièces",
       "categorie": "Accessoires",
       "fournisseurId": 1,
       "fournisseur": "TechSupply Corp",
+      "emplacement": "B2-D3",
+      "delaiLivraison": 10,
+      "dernierAchat": "2024-08-15",
       "dateCreation": "2024-03-05",
-      "dateModification": "2024-10-02"
+      "dateModification": "2024-10-02",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-08T13:15:00",
+          "type": "sortie",
+          "quantity": 1,
+          "reason": "Vente",
+          "reference": "ORD-004",
+          "user": "Sophie Lambert",
+          "stockBefore": 1,
+          "stockAfter": 0,
+          "notes": "Dernière unité en stock"
+        },
+        {
+          "id": 2,
+          "date": "2024-09-20T09:45:00",
+          "type": "sortie",
+          "quantity": 2,
+          "reason": "Perte/Casse",
+          "reference": "",
+          "user": "Pierre Durand",
+          "stockBefore": 3,
+          "stockAfter": 1,
+          "notes": "Dégâts d'eau suite à fuite"
+        },
+        {
+          "id": 3,
+          "date": "2024-08-15T11:00:00",
+          "type": "entree",
+          "quantity": 8,
+          "reason": "Réception commande",
+          "reference": "ACH-005",
+          "user": "Marie Martin",
+          "stockBefore": -5,
+          "stockAfter": 3,
+          "notes": "Commande de réapprovisionnement"
+        }
+      ]
     },
     {
       "id": 4,
@@ -179,15 +305,57 @@
       "nom": "Papier A4 Blanc",
       "description": "Rame de papier blanc 80g/m²",
       "quantite": 150,
-      "prixAchat": 4.50,
-      "prixVente": 8.90,
+      "prixAchat": 4.5,
+      "prixVente": 8.9,
       "seuilMinimum": 20,
+      "seuilMaximum": 300,
       "uniteMesure": "rames",
       "categorie": "Fournitures",
       "fournisseurId": 2,
       "fournisseur": "Bureau Plus SARL",
+      "emplacement": "C1-A1",
+      "delaiLivraison": 3,
+      "dernierAchat": "2024-10-03",
       "dateCreation": "2024-01-20",
-      "dateModification": "2024-09-15"
+      "dateModification": "2024-09-15",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-10T16:20:00",
+          "type": "sortie",
+          "quantity": 15,
+          "reason": "Vente",
+          "reference": "ORD-001",
+          "user": "Jean Dupont",
+          "stockBefore": 165,
+          "stockAfter": 150,
+          "notes": "Commande standard bureau"
+        },
+        {
+          "id": 2,
+          "date": "2024-10-07T08:30:00",
+          "type": "sortie",
+          "quantity": 20,
+          "reason": "Vente",
+          "reference": "ORD-005",
+          "user": "Thomas Leroy",
+          "stockBefore": 185,
+          "stockAfter": 165,
+          "notes": "Grosse commande fournitures"
+        },
+        {
+          "id": 3,
+          "date": "2024-10-03T14:00:00",
+          "type": "entree",
+          "quantity": 100,
+          "reason": "Réception commande",
+          "reference": "ACH-002",
+          "user": "Marie Martin",
+          "stockBefore": 85,
+          "stockAfter": 185,
+          "notes": "Livraison Bureau Plus SARL"
+        }
+      ]
     },
     {
       "id": 5,
@@ -198,12 +366,54 @@
       "prixAchat": 180,
       "prixVente": 320,
       "seuilMinimum": 3,
+      "seuilMaximum": 15,
       "uniteMesure": "pièces",
       "categorie": "Informatique",
       "fournisseurId": 1,
       "fournisseur": "TechSupply Corp",
+      "emplacement": "A2-B1",
+      "delaiLivraison": 7,
+      "dernierAchat": "2024-09-20",
       "dateCreation": "2024-02-28",
-      "dateModification": "2024-09-20"
+      "dateModification": "2024-09-20",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-09T12:10:00",
+          "type": "sortie",
+          "quantity": 1,
+          "reason": "Vente",
+          "reference": "ORD-003",
+          "user": "Pierre Durand",
+          "stockBefore": 9,
+          "stockAfter": 8,
+          "notes": "Vente avec installation"
+        },
+        {
+          "id": 2,
+          "date": "2024-09-20T15:45:00",
+          "type": "entree",
+          "quantity": 5,
+          "reason": "Réception commande",
+          "reference": "ACH-003",
+          "user": "Sophie Lambert",
+          "stockBefore": 4,
+          "stockAfter": 9,
+          "notes": "Réapprovisionnement préventif"
+        },
+        {
+          "id": 3,
+          "date": "2024-09-10T10:15:00",
+          "type": "sortie",
+          "quantity": 2,
+          "reason": "Utilisation interne",
+          "reference": "",
+          "user": "Marie Martin",
+          "stockBefore": 6,
+          "stockAfter": 4,
+          "notes": "Installation bureau administration"
+        }
+      ]
     },
     {
       "id": 6,
@@ -211,15 +421,57 @@
       "nom": "Stylos à bille",
       "description": "Lot de 10 stylos à bille bleus",
       "quantite": 45,
-      "prixAchat": 3.20,
-      "prixVente": 6.50,
+      "prixAchat": 3.2,
+      "prixVente": 6.5,
       "seuilMinimum": 15,
+      "seuilMaximum": 100,
       "uniteMesure": "lots",
       "categorie": "Fournitures",
       "fournisseurId": 2,
       "fournisseur": "Bureau Plus SARL",
+      "emplacement": "C2-A2",
+      "delaiLivraison": 2,
+      "dernierAchat": "2024-10-03",
       "dateCreation": "2024-03-12",
-      "dateModification": "2024-09-25"
+      "dateModification": "2024-09-25",
+      "mouvements": [
+        {
+          "id": 1,
+          "date": "2024-10-09T11:30:00",
+          "type": "sortie",
+          "quantity": 5,
+          "reason": "Vente",
+          "reference": "ORD-002",
+          "user": "Marie Martin",
+          "stockBefore": 50,
+          "stockAfter": 45,
+          "notes": "Commande avec ordinateur"
+        },
+        {
+          "id": 2,
+          "date": "2024-10-07T14:20:00",
+          "type": "sortie",
+          "quantity": 10,
+          "reason": "Vente",
+          "reference": "ORD-005",
+          "user": "Thomas Leroy",
+          "stockBefore": 60,
+          "stockAfter": 50,
+          "notes": "Commande fournitures complète"
+        },
+        {
+          "id": 3,
+          "date": "2024-10-03T16:45:00",
+          "type": "entree",
+          "quantity": 50,
+          "reason": "Réception commande",
+          "reference": "ACH-002",
+          "user": "Pierre Durand",
+          "stockBefore": 10,
+          "stockAfter": 60,
+          "notes": "Livraison Bureau Plus SARL"
+        }
+      ]
     }
   ],
   "commandes": [
@@ -233,7 +485,7 @@
       "statut": "completed",
       "montantHT": 204.17,
       "tva": 40.83,
-      "montantTTC": 245.50,
+      "montantTTC": 245.5,
       "items": [
         {
           "id": 1,
@@ -248,8 +500,8 @@
           "articleId": 4,
           "nom": "Papier A4 Blanc",
           "quantite": 15,
-          "prixUnitaire": 8.90,
-          "montant": 133.50
+          "prixUnitaire": 8.9,
+          "montant": 133.5
         }
       ]
     },
@@ -261,17 +513,17 @@
       "date": "2024-10-09",
       "dateLivraison": "2024-10-11",
       "statut": "processing",
-      "montantHT": 157.50,
-      "tva": 31.50,
-      "montantTTC": 189.00,
+      "montantHT": 157.5,
+      "tva": 31.5,
+      "montantTTC": 189.0,
       "items": [
         {
           "id": 1,
           "articleId": 6,
           "nom": "Stylos à bille",
           "quantite": 5,
-          "prixUnitaire": 6.50,
-          "montant": 32.50
+          "prixUnitaire": 6.5,
+          "montant": 32.5
         },
         {
           "id": 2,
@@ -315,7 +567,7 @@
       "statut": "completed",
       "montantHT": 130.17,
       "tva": 26.03,
-      "montantTTC": 156.20,
+      "montantTTC": 156.2,
       "items": [
         {
           "id": 1,
@@ -337,14 +589,14 @@
       "statut": "failed",
       "montantHT": 232.42,
       "tva": 46.48,
-      "montantTTC": 278.90,
+      "montantTTC": 278.9,
       "items": [
         {
           "id": 1,
           "articleId": 4,
           "nom": "Papier A4 Blanc",
           "quantite": 20,
-          "prixUnitaire": 8.90,
+          "prixUnitaire": 8.9,
           "montant": 178
         },
         {
@@ -352,11 +604,12 @@
           "articleId": 6,
           "nom": "Stylos à bille",
           "quantite": 10,
-          "prixUnitaire": 6.50,
+          "prixUnitaire": 6.5,
           "montant": 65
         }
       ]
-    }  ],
+    }
+  ],
   "commandes_fournisseurs": [
     {
       "id": 1,
@@ -366,9 +619,9 @@
       "date": "2024-10-05",
       "dateLivraison": "2024-10-08",
       "statut": "livre",
-      "montantHT": 2500.00,
-      "tva": 500.00,
-      "montantTTC": 3000.00,
+      "montantHT": 2500.0,
+      "tva": 500.0,
+      "montantTTC": 3000.0,
       "notes": "Commande urgente",
       "items": [
         {
@@ -397,9 +650,9 @@
       "date": "2024-10-03",
       "dateLivraison": "2024-10-06",
       "statut": "livre",
-      "montantHT": 800.00,
-      "tva": 160.00,
-      "montantTTC": 960.00,
+      "montantHT": 800.0,
+      "tva": 160.0,
+      "montantTTC": 960.0,
       "notes": "",
       "items": [
         {
@@ -407,7 +660,7 @@
           "articleId": 4,
           "nom": "Papier A4 Blanc",
           "quantite": 100,
-          "prixUnitaire": 4.50,
+          "prixUnitaire": 4.5,
           "montant": 450
         },
         {
@@ -415,7 +668,7 @@
           "articleId": 6,
           "nom": "Stylos à bille",
           "quantite": 50,
-          "prixUnitaire": 3.20,
+          "prixUnitaire": 3.2,
           "montant": 160
         }
       ]
@@ -428,9 +681,9 @@
       "date": "2024-10-01",
       "dateLivraison": "2024-10-04",
       "statut": "en_attente",
-      "montantHT": 1500.00,
-      "tva": 300.00,
-      "montantTTC": 1800.00,
+      "montantHT": 1500.0,
+      "tva": 300.0,
+      "montantTTC": 1800.0,
       "notes": "À confirmer",
       "items": [
         {
@@ -461,9 +714,9 @@
       "achatId": 1,
       "date": "2024-10-08",
       "dateEcheance": "2024-11-08",
-      "montantHT": 2500.00,
-      "tva": 500.00,
-      "montantTTC": 3000.00,
+      "montantHT": 2500.0,
+      "tva": 500.0,
+      "montantTTC": 3000.0,
       "statut": "payee",
       "datePaiement": "2024-10-10",
       "notes": "Paiement par virement"
@@ -476,9 +729,9 @@
       "achatId": 2,
       "date": "2024-10-06",
       "dateEcheance": "2024-11-06",
-      "montantHT": 800.00,
-      "tva": 160.00,
-      "montantTTC": 960.00,
+      "montantHT": 800.0,
+      "tva": 160.0,
+      "montantTTC": 960.0,
       "statut": "en_attente",
       "datePaiement": null,
       "notes": ""
@@ -491,9 +744,9 @@
       "achatId": null,
       "date": "2024-09-28",
       "dateEcheance": "2024-10-28",
-      "montantHT": 1200.00,
-      "tva": 240.00,
-      "montantTTC": 1440.00,
+      "montantHT": 1200.0,
+      "tva": 240.0,
+      "montantTTC": 1440.0,
       "statut": "en_retard",
       "datePaiement": null,
       "notes": "Relance nécessaire"
@@ -536,7 +789,8 @@
       "total": 231,
       "inStock": 200,
       "outOfStock": 12,
-      "lowStock": 19,      "totalValue": 45680.50
+      "lowStock": 19,
+      "totalValue": 45680.5
     },
     "commandes_fournisseurs": {
       "total": 156,
@@ -562,7 +816,8 @@
       "date": "2024-10-14",
       "heure": "Il y a 2h",
       "lu": false,
-      "priority": "high"    },
+      "priority": "high"
+    },
     {
       "id": 3,
       "type": "error",
@@ -572,6 +827,53 @@
       "heure": "Il y a 1h",
       "lu": true,
       "priority": "high"
+    }
+  ],
+  "stock_movements": [
+    {
+      "id": 1,
+      "articleId": 1,
+      "articleReference": "ART001",
+      "articleNom": "Ordinateur Portable Dell",
+      "date": "2024-10-15T09:30:00",
+      "type": "sortie",
+      "quantity": 1,
+      "reason": "Vente",
+      "reference": "ORD-NEW-001",
+      "user": "Admin User",
+      "stockBefore": 25,
+      "stockAfter": 24,
+      "notes": "Vente directe magasin"
+    },
+    {
+      "id": 2,
+      "articleId": 2,
+      "articleReference": "ART002",
+      "articleNom": "Souris sans fil Logitech",
+      "date": "2024-10-15T14:15:00",
+      "type": "entree",
+      "quantity": 10,
+      "reason": "Correction inventaire",
+      "reference": "INV-2024-001",
+      "user": "Stock Manager",
+      "stockBefore": 3,
+      "stockAfter": 13,
+      "notes": "Correction suite à inventaire physique"
+    },
+    {
+      "id": 3,
+      "articleId": 3,
+      "articleReference": "ART003",
+      "articleNom": "Clavier mécanique",
+      "date": "2024-10-15T16:45:00",
+      "type": "entree",
+      "quantity": 15,
+      "reason": "Réception commande",
+      "reference": "ACH-NEW-001",
+      "user": "Receiving Manager",
+      "stockBefore": 0,
+      "stockAfter": 15,
+      "notes": "Nouvelle livraison fournisseur TechSupply"
     }
   ]
 }

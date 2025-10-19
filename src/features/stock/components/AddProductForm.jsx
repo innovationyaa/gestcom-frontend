@@ -1,46 +1,57 @@
-import { useState } from 'react';
-import { X, Package, Save, Loader2, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useState } from "react";
+import { X, Package, Save, Loader2, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export function AddProductForm({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
-    reference: '',
-    nom: '',
-    description: '',
-    quantite: '',
-    prixAchat: '',
-    prixVente: '',
-    seuilMinimum: '',
-    uniteMesure: 'pièces',
-    categorie: '',
-    fournisseur: '',
+    reference: "",
+    nom: "",
+    description: "",
+    quantite: "",
+    prixAchat: "",
+    prixVente: "",
+    seuilMinimum: "",
+    uniteMesure: "pièces",
+    categorie: "",
+    fournisseur: "",
+    imageUrl: "",
   });
+  const [previewUrl, setPreviewUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value, files, type } = e.target;
+    if (type === "file") {
+      const file = files?.[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        setFormData((prev) => ({ ...prev, imageUrl: url }));
+      }
+      return;
+    }
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // Format the data before saving
       const productData = {
@@ -49,14 +60,14 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
         prixAchat: parseFloat(formData.prixAchat),
         prixVente: parseFloat(formData.prixVente),
         seuilMinimum: parseInt(formData.seuilMinimum, 10),
-        dateCreation: new Date().toISOString().split('T')[0],
-        dateModification: new Date().toISOString().split('T')[0]
+        dateCreation: new Date().toISOString().split("T")[0],
+        dateModification: new Date().toISOString().split("T")[0],
       };
-      
+
       await onSave(productData);
       onClose();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error("Error saving product:", error);
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +99,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
             {/* Colonne de gauche */}
             <div className="space-y-4 overflow-visible">
               <div className="space-y-1.5">
-                <Label htmlFor="reference" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="reference"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Référence <span className="text-[#ef4444]">*</span>
                 </Label>
                 <Input
@@ -103,7 +117,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="nom" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="nom"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Nom du produit <span className="text-[#ef4444]">*</span>
                 </Label>
                 <Input
@@ -118,7 +135,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="categorie" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="categorie"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Catégorie <span className="text-[#ef4444]">*</span>
                 </Label>
                 <Input
@@ -133,7 +153,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="fournisseur" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="fournisseur"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Fournisseur
                 </Label>
                 <Input
@@ -147,7 +170,53 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="description" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="imageFile"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  Image du produit (fichier)
+                </Label>
+                <input
+                  id="imageFile"
+                  name="imageFile"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="block w-full text-sm text-[var(--color-foreground)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-[var(--color-border)] file:text-sm file:font-medium file:bg-white file:text-[var(--color-foreground)] hover:file:bg-[var(--color-background)]"
+                />
+                {(previewUrl || formData.imageUrl) && (
+                  <div className="mt-2 h-20 w-20 rounded-md overflow-hidden border border-[var(--color-border)]">
+                    <img
+                      src={previewUrl || formData.imageUrl}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="imageUrl"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  URL de l'image
+                </Label>
+                <Input
+                  id="imageUrl"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleChange}
+                  placeholder="https://exemple.com/image.jpg"
+                  className="w-full border-[#e0e7ff] focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f8faff] px-3.5 focus:outline-none focus:ring-offset-1 focus:ring-offset-transparent"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="description"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Description
                 </Label>
                 <Textarea
@@ -166,7 +235,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
             <div className="space-y-4 overflow-visible">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="quantite" className="text-sm font-medium text-[#171717]">
+                  <Label
+                    htmlFor="quantite"
+                    className="text-sm font-medium text-[#171717]"
+                  >
                     Quantité <span className="text-[#ef4444]">*</span>
                   </Label>
                   <Input
@@ -182,7 +254,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="seuilMinimum" className="text-sm font-medium text-[#171717]">
+                  <Label
+                    htmlFor="seuilMinimum"
+                    className="text-sm font-medium text-[#171717]"
+                  >
                     Seuil min <span className="text-[#ef4444]">*</span>
                   </Label>
                   <Input
@@ -200,7 +275,10 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="prixAchat" className="text-sm font-medium text-[#171717]">
+                  <Label
+                    htmlFor="prixAchat"
+                    className="text-sm font-medium text-[#171717]"
+                  >
                     Prix d'achat (€) <span className="text-[#ef4444]">*</span>
                   </Label>
                   <div className="relative">
@@ -215,12 +293,17 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
                       required
                       className="w-full border-[#e5e5e5] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] rounded-md text-sm h-10 pl-8"
                     />
-                    <span className="absolute left-3 top-2.5 text-sm text-[#737373]">€</span>
+                    <span className="absolute left-3 top-2.5 text-sm text-[#737373]">
+                      €
+                    </span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="prixVente" className="text-sm font-medium text-[#171717]">
+                  <Label
+                    htmlFor="prixVente"
+                    className="text-sm font-medium text-[#171717]"
+                  >
                     Prix de vente (€) <span className="text-[#ef4444]">*</span>
                   </Label>
                   <div className="relative">
@@ -235,13 +318,18 @@ export function AddProductForm({ isOpen, onClose, onSave }) {
                       required
                       className="w-full border-[#e5e5e5] focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] rounded-md text-sm h-10 pl-8"
                     />
-                    <span className="absolute left-3 top-2.5 text-sm text-[#737373]">€</span>
+                    <span className="absolute left-3 top-2.5 text-sm text-[#737373]">
+                      €
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="uniteMesure" className="text-sm font-medium text-[#171717]">
+                <Label
+                  htmlFor="uniteMesure"
+                  className="text-sm font-medium text-[#171717]"
+                >
                   Unité de mesure <span className="text-[#ef4444]">*</span>
                 </Label>
                 <div className="relative">

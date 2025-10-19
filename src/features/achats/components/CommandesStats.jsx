@@ -1,13 +1,23 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreditCard, Clock, CheckCircle, XCircle, DollarSign, Package } from 'lucide-react';
-import { formatCurrency } from '../utils/commandesHelpers';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  CreditCard,
+  Clock,
+  CheckCircle,
+  XCircle,
+  DollarSign,
+  Package,
+} from "lucide-react";
+import { formatCurrency } from "../utils/commandesHelpers";
 
 export const CommandesStats = ({ stats, loading }) => {
   if (loading) {
     return (
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="bg-[var(--color-surface)] border-[var(--color-border)] animate-pulse">
+          <Card
+            key={i}
+            className="bg-[var(--color-surface)] border-[var(--color-border)] animate-pulse"
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <div className="h-4 bg-[var(--color-border)] rounded w-24"></div>
               <div className="h-4 w-4 bg-[var(--color-border)] rounded"></div>
@@ -29,7 +39,7 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "Nombre total de commandes",
       color: "var(--color-blue)",
       bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
+      borderColor: "border-blue-200",
     },
     {
       title: "Payées",
@@ -38,7 +48,7 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "Commandes réglées",
       color: "var(--color-success)",
       bgColor: "bg-green-50",
-      borderColor: "border-green-200"
+      borderColor: "border-green-200",
     },
     {
       title: "En attente",
@@ -47,7 +57,7 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "En cours de traitement",
       color: "var(--color-warning)",
       bgColor: "bg-orange-50",
-      borderColor: "border-orange-200"
+      borderColor: "border-orange-200",
     },
     {
       title: "Annulées",
@@ -56,7 +66,7 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "Commandes annulées",
       color: "var(--color-error)",
       bgColor: "bg-red-50",
-      borderColor: "border-red-200"
+      borderColor: "border-red-200",
     },
     {
       title: "Montant total",
@@ -65,7 +75,7 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "Valeur totale des commandes",
       color: "var(--color-success)",
       bgColor: "bg-green-50",
-      borderColor: "border-green-200"
+      borderColor: "border-green-200",
     },
     {
       title: "Montant moyen",
@@ -74,14 +84,18 @@ export const CommandesStats = ({ stats, loading }) => {
       description: "Montant moyen par commande",
       color: "var(--color-blue)",
       bgColor: "bg-blue-50",
-      borderColor: "border-blue-200"
-    }
-  ];  return (
+      borderColor: "border-blue-200",
+    },
+  ];
+  return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
       {statsCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <Card key={index} className={`bg-[var(--color-surface)] border-[var(--color-border)] shadow-sm hover:shadow-md transition-shadow duration-200 ${stat.borderColor} ${stat.bgColor}`}>
+          <Card
+            key={index}
+            className={`bg-[var(--color-surface)] border-[var(--color-border)] shadow-sm hover:shadow-md transition-shadow duration-200 ${stat.borderColor} ${stat.bgColor}`}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-[var(--color-foreground)]">
                 {stat.title}

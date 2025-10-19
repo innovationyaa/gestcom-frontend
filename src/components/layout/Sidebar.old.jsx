@@ -1,14 +1,20 @@
-﻿import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Users,
+  FileText,
   Settings,
   BarChart3,
   Truck,
+  Calculator,
   ChevronRight,
   ChevronDown,
+  LogOut,
   User,
 } from "lucide-react";
 
@@ -71,7 +77,6 @@ const menuItems = [
 const MenuItem = ({ item, isActive, onToggle, isOpen }) => {
   const Icon = item.icon;
   const hasItems = item.items && item.items.length > 0;
-  const location = useLocation();
 
   return (
     <div className="mb-1">
@@ -146,7 +151,7 @@ function useClickOutside(ref, callback) {
   }, [ref, callback]);
 }
 
-export function Sidebar({ isOpen = false, onClose = () => {} } = {}) {
+export function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const [openItems, setOpenItems] = useState({});
   const dropdownRef = useRef(null);

@@ -75,10 +75,12 @@ export function FournisseursStats({ stats, loading }) {
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {statsCards.map((stat, index) => {
         const Icon = stat.icon;
-        return (          <Card
+        return (
+          <Card
             key={index}
             className={`bg-[var(--color-surface)] border-[var(--color-border)] shadow-sm hover:shadow-md transition-shadow duration-200 ${stat.bgColor} ${stat.borderColor}`}
-          ><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-sm font-medium text-[var(--color-foreground)]">
                 {stat.title}
               </CardTitle>

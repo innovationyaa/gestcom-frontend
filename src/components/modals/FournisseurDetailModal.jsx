@@ -21,11 +21,17 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 
-export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact }) {
+export function FournisseurDetailModal({
+  fournisseur,
+  onClose,
+  onEdit,
+  onContact,
+}) {
   if (!fournisseur) return null;
 
   const getStatusBadge = (statut) => {
-    switch (statut) {      case "actif":
+    switch (statut) {
+      case "actif":
         return (
           <Badge
             variant="secondary"
@@ -57,10 +63,14 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
     }
   };
 
-  const getTypeBadge = (type) => {    const typeColors = {
-      entreprise: "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-300 shadow-sm",
-      particulier: "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-300 shadow-sm",
-      association: "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-300 shadow-sm",
+  const getTypeBadge = (type) => {
+    const typeColors = {
+      entreprise:
+        "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-300 shadow-sm",
+      particulier:
+        "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-300 shadow-sm",
+      association:
+        "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-purple-300 shadow-sm",
     };
 
     return (
@@ -105,7 +115,9 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
             {fournisseur.dateCreation && (
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                <span>Client depuis le {formatDate(fournisseur.dateCreation)}</span>
+                <span>
+                  Client depuis le {formatDate(fournisseur.dateCreation)}
+                </span>
               </div>
             )}
           </div>
@@ -113,7 +125,8 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
         <div className="flex items-center gap-2">
           {getStatusBadge(fournisseur.statut)}
         </div>
-      </div>      {/* Actions */}
+      </div>{" "}
+      {/* Actions */}
       <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200/50">
         <Button
           variant="outline"
@@ -142,7 +155,6 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           Nouvelle commande
         </Button>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         {/* Informations de Contact */}
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -157,8 +169,10 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-[var(--color-foreground-muted)]" />
                 <div>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">Email</p>
-                  <a 
+                  <p className="text-sm text-[var(--color-foreground-muted)]">
+                    Email
+                  </p>
+                  <a
                     href={`mailto:${fournisseur.email}`}
                     className="text-[var(--color-blue)] hover:underline"
                   >
@@ -167,13 +181,15 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
                 </div>
               </div>
             )}
-            
+
             {fournisseur.telephone && (
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-[var(--color-foreground-muted)]" />
                 <div>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">Téléphone</p>
-                  <a 
+                  <p className="text-sm text-[var(--color-foreground-muted)]">
+                    Téléphone
+                  </p>
+                  <a
                     href={`tel:${fournisseur.telephone}`}
                     className="text-[var(--color-blue)] hover:underline"
                   >
@@ -187,8 +203,12 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-[var(--color-foreground-muted)]" />
                 <div>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">Fax</p>
-                  <p className="text-[var(--color-foreground)]">{fournisseur.fax}</p>
+                  <p className="text-sm text-[var(--color-foreground-muted)]">
+                    Fax
+                  </p>
+                  <p className="text-[var(--color-foreground)]">
+                    {fournisseur.fax}
+                  </p>
                 </div>
               </div>
             )}
@@ -197,8 +217,10 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
               <div className="flex items-center gap-3">
                 <Globe className="h-4 w-4 text-[var(--color-foreground-muted)]" />
                 <div>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">Site web</p>
-                  <a 
+                  <p className="text-sm text-[var(--color-foreground-muted)]">
+                    Site web
+                  </p>
+                  <a
                     href={fournisseur.siteWeb}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -223,23 +245,28 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           <CardContent>
             {fournisseur.adresse ? (
               <div className="space-y-2">
-                <p className="text-[var(--color-foreground)]">{fournisseur.adresse}</p>
+                <p className="text-[var(--color-foreground)]">
+                  {fournisseur.adresse}
+                </p>
                 {fournisseur.codePostal && fournisseur.ville && (
                   <p className="text-[var(--color-foreground)]">
                     {fournisseur.codePostal} {fournisseur.ville}
                   </p>
                 )}
                 {fournisseur.pays && (
-                  <p className="text-[var(--color-foreground-muted)]">{fournisseur.pays}</p>
+                  <p className="text-[var(--color-foreground-muted)]">
+                    {fournisseur.pays}
+                  </p>
                 )}
               </div>
             ) : (
-              <p className="text-[var(--color-foreground-muted)]">Adresse non renseignée</p>
+              <p className="text-[var(--color-foreground-muted)]">
+                Adresse non renseignée
+              </p>
             )}
           </CardContent>
         </Card>
       </div>
-
       {/* Informations Commerciales */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Conditions de Paiement */}
@@ -253,29 +280,43 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           <CardContent className="space-y-3">
             {fournisseur.delaiPaiement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Délai de paiement</span>
-                <span className="font-medium">{fournisseur.delaiPaiement} jours</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Délai de paiement
+                </span>
+                <span className="font-medium">
+                  {fournisseur.delaiPaiement} jours
+                </span>
               </div>
             )}
-            
+
             {fournisseur.modePaiement && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Mode de paiement</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Mode de paiement
+                </span>
                 <span className="font-medium">{fournisseur.modePaiement}</span>
               </div>
             )}
 
             {fournisseur.remise && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Remise accordée</span>
-                <span className="font-medium text-[var(--color-success)]">{fournisseur.remise}%</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Remise accordée
+                </span>
+                <span className="font-medium text-[var(--color-success)]">
+                  {fournisseur.remise}%
+                </span>
               </div>
             )}
 
             {fournisseur.creditLimit && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Limite de crédit</span>
-                <span className="font-medium">{formatCurrency(fournisseur.creditLimit)}</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Limite de crédit
+                </span>
+                <span className="font-medium">
+                  {formatCurrency(fournisseur.creditLimit)}
+                </span>
               </div>
             )}
           </CardContent>
@@ -292,14 +333,20 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           <CardContent className="space-y-3">
             {fournisseur.nombreCommandes && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Commandes passées</span>
-                <span className="font-medium">{fournisseur.nombreCommandes}</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Commandes passées
+                </span>
+                <span className="font-medium">
+                  {fournisseur.nombreCommandes}
+                </span>
               </div>
             )}
-            
+
             {fournisseur.montantTotal && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Montant total</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Montant total
+                </span>
                 <span className="font-medium text-[var(--color-blue)]">
                   {formatCurrency(fournisseur.montantTotal)}
                 </span>
@@ -308,24 +355,32 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
 
             {fournisseur.derniereCommande && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Dernière commande</span>
-                <span className="font-medium">{formatDate(fournisseur.derniereCommande)}</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Dernière commande
+                </span>
+                <span className="font-medium">
+                  {formatDate(fournisseur.derniereCommande)}
+                </span>
               </div>
             )}
 
             {fournisseur.evaluationQualite && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">Évaluation qualité</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  Évaluation qualité
+                </span>
                 <div className="flex items-center gap-1">
-                  <span className="font-medium">{fournisseur.evaluationQualite}/5</span>
+                  <span className="font-medium">
+                    {fournisseur.evaluationQualite}/5
+                  </span>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
                       <span
                         key={i}
                         className={`text-xs ${
                           i < fournisseur.evaluationQualite
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
+                            ? "text-yellow-400"
+                            : "text-gray-300"
                         }`}
                       >
                         ★
@@ -338,7 +393,6 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           </CardContent>
         </Card>
       </div>
-
       {/* Informations Légales */}
       {(fournisseur.siret || fournisseur.numeroTVA || fournisseur.rcs) && (
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -351,28 +405,33 @@ export function FournisseurDetailModal({ fournisseur, onClose, onEdit, onContact
           <CardContent className="space-y-3">
             {fournisseur.siret && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">SIRET</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  SIRET
+                </span>
                 <span className="font-medium">{fournisseur.siret}</span>
               </div>
             )}
-            
+
             {fournisseur.numeroTVA && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">N° TVA</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  N° TVA
+                </span>
                 <span className="font-medium">{fournisseur.numeroTVA}</span>
               </div>
             )}
 
             {fournisseur.rcs && (
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-foreground-muted)]">RCS</span>
+                <span className="text-sm text-[var(--color-foreground-muted)]">
+                  RCS
+                </span>
                 <span className="font-medium">{fournisseur.rcs}</span>
               </div>
             )}
           </CardContent>
         </Card>
       )}
-
       {/* Notes */}
       {fournisseur.notes && (
         <Card className="bg-[var(--color-surface)] border-[var(--color-border)]">
