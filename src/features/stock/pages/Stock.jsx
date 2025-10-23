@@ -104,7 +104,7 @@ export default function Stock() {
         </div>
       </div>{" "}
       {/* Statistiques */}
-      <StockStats stats={stats} loading={statsLoading} />      {/* Liste du Stock */}
+      <StockStats stats={stats} loading={statsLoading} /> {/* Liste du Stock */}
       <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-3 sm:p-4 lg:p-6 w-full">
         <h2 className="text-sm sm:text-base font-medium text-[var(--color-foreground)] mb-4">
           Liste du Stock
@@ -298,7 +298,8 @@ export default function Stock() {
       {/* Add Product Form Modal */}
       <AddProductForm
         isOpen={isAddProductOpen}
-        onClose={() => setIsAddProductOpen(false)}        onSave={async (productData) => {
+        onClose={() => setIsAddProductOpen(false)}
+        onSave={async (productData) => {
           try {
             await addStockItem(productData);
             // The stock will be refreshed automatically by the useStock hook

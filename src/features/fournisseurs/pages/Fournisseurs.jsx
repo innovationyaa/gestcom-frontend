@@ -1,78 +1,50 @@
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Plus,
-  Search,
-  Eye,
-  Edit,
-  Trash2,
-  MapPin,
-  Phone,
-  Mail,
-  Building,
-} from "lucide-react";
+import { Plus, Search, Eye, Trash2, Loader2 } from "lucide-react";
 
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { DataTable } from "@/components/ui/DataTable";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // App Components
-import { FournisseursStats } from "../components/FournisseursStats";
 import { AddFournisseurForm } from "../components/AddFournisseurForm";
 import { useFournisseurs } from "../hooks/useFournisseurs";
-import { DetailModal, FournisseurDetailModal } from "@/components/modals";
+import { FournisseurDetailModal } from "@/components/modals";
 
 export const Fournisseurs = () => {
-  const navigate = useNavigate();
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [selectedFournisseur, setSelectedFournisseur] = useState(null);
-  const [showFournisseurModal, setShowFournisseurModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
-  const {
-    fournisseurs,
-    loading,
-    error,
-    stats,
-    addFournisseur,
-    deleteFournisseur,
-    refreshData,
-  } = useFournisseurs();
+  const { fournisseurs, loading, error, addFournisseur, deleteFournisseur } =
+    useFournisseurs();
 
-  // Filter fournisseurs based on search and filters
+  // Filter fournisseurs based on search
   const filteredFournisseurs = useMemo(() => {
     return fournisseurs.filter((fournisseur) => {
-      const matchesSearch =
-        !searchTerm ||
-        fournisseur.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fournisseur.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        fournisseur.telephone?.includes(searchTerm);
-
-      const matchesStatus =
-        statusFilter === "all" || fournisseur.statut === statusFilter;
-      const matchesType =
-        typeFilter === "all" || fournisseur.type === typeFilter;
-
-      return matchesSearch && matchesStatus && matchesType;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        fournisseur.nom.toLowerCase().includes(searchLower) ||
+        fournisseur.ice.includes(searchTerm) ||
+        fournisseur.ifNumber.includes(searchTerm) ||
+        fournisseur.contact.toLowerCase().includes(searchLower) ||
+        fournisseur.adresse.toLowerCase().includes(searchLower)
+      );
     });
-  }, [fournisseurs, searchTerm, statusFilter, typeFilter]);
+  }, [fournisseurs, searchTerm]);
 
-  const handleAddFournisseur = async (formData) => {
-    const result = await addFournisseur(formData);
+  const handleAddFournisseur = async (payload) => {
+    const result = await addFournisseur(payload);
     if (result.success) {
       setShowAddForm(false);
-      await refreshData();
     }
     return result;
   };
@@ -81,169 +53,16 @@ export const Fournisseurs = () => {
     if (
       window.confirm(`Êtes-vous sûr de vouloir supprimer ${fournisseur.nom} ?`)
     ) {
-      await deleteFournisseur(fournisseur.id);
-      await refreshData();
+      const result = await deleteFournisseur(fournisseur.id);
+      if (!result.success) {
+        alert(`Erreur: ${result.error}`);
+      }
     }
   };
+
   const handleViewFournisseur = (fournisseur) => {
     setSelectedFournisseur(fournisseur);
-    setShowFournisseurModal(true);
-  };
-  const handleCloseFournisseurModal = () => {
-    setShowFournisseurModal(false);
-    setSelectedFournisseur(null);
-  };
-
-  const handleSaveFournisseur = async (updatedFournisseur) => {
-    try {
-      // TODO: Implement update fournisseur service call
-      console.log("Saving updated fournisseur:", updatedFournisseur);
-      await refreshData();
-      return { success: true };
-    } catch (error) {
-      console.error("Error updating fournisseur:", error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const getStatusBadge = (statut) => {
-    switch (statut) {
-      case "actif":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-[var(--color-success)] bg-opacity-10 text-[var(--color-success)] border border-[var(--color-success)] border-opacity-20"
-          >
-            Actif
-          </Badge>
-        );
-      case "inactif":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-[var(--color-warning)] bg-opacity-10 text-[var(--color-warning)] border border-[var(--color-warning)] border-opacity-20"
-          >
-            Inactif
-          </Badge>
-        );
-      case "suspendu":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-[var(--color-error)] bg-opacity-10 text-[var(--color-error)] border border-[var(--color-error)] border-opacity-20"
-          >
-            Suspendu
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">Inconnu</Badge>;
-    }
-  };
-
-  const getTypeBadge = (type) => {
-    const typeColors = {
-      entreprise: "bg-blue-50 text-blue-700 border-blue-200",
-      particulier: "bg-green-50 text-green-700 border-green-200",
-      association: "bg-purple-50 text-purple-700 border-purple-200",
-    };
-
-    return (
-      <Badge
-        variant="outline"
-        className={typeColors[type] || "bg-gray-50 text-gray-700"}
-      >
-        {type?.charAt(0).toUpperCase() + type?.slice(1) || "Non défini"}
-      </Badge>
-    );
-  };
-
-  const columns = [
-    {
-      header: "Nom",
-      accessor: "nom",
-      cell: (row) => (
-        <div className="flex items-center gap-2">
-          <Building className="h-4 w-4 text-[var(--color-foreground-muted)]" />
-          <span className="font-medium">{row.nom}</span>
-        </div>
-      ),
-    },
-    {
-      header: "Contact",
-      accessor: "contact",
-      cell: (row) => (
-        <div className="space-y-1">
-          {row.email && (
-            <div className="flex items-center gap-1 text-sm">
-              <Mail className="h-3 w-3 text-[var(--color-foreground-muted)]" />
-              <span>{row.email}</span>
-            </div>
-          )}
-          {row.telephone && (
-            <div className="flex items-center gap-1 text-sm">
-              <Phone className="h-3 w-3 text-[var(--color-foreground-muted)]" />
-              <span>{row.telephone}</span>
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Adresse",
-      accessor: "adresse",
-      cell: (row) => (
-        <div className="flex items-center gap-1 text-sm">
-          <MapPin className="h-3 w-3 text-[var(--color-foreground-muted)]" />
-          <span className="truncate max-w-[200px]">
-            {row.adresse || "Non renseignée"}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Type",
-      accessor: "type",
-      cell: (row) => getTypeBadge(row.type),
-    },
-    {
-      header: "Statut",
-      accessor: "statut",
-      cell: (row) => getStatusBadge(row.statut),
-    },
-    {
-      header: "Actions",
-      accessor: "actions",
-      align: "right",
-      cell: (row) => (
-        <div className="flex justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleViewFournisseur(row);
-            }}
-            className="h-8 w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
-          >
-            <Eye className="h-4 w-4" />{" "}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteFournisseur(row);
-            }}
-            className="h-8 w-8 p-0 hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
-  const handleRowClick = (fournisseur) => {
-    handleViewFournisseur(fournisseur);
+    setShowDetailModal(true);
   };
 
   if (error) {
@@ -254,178 +73,160 @@ export const Fournisseurs = () => {
             Gestion des Fournisseurs
           </h1>
           <p className="text-[var(--color-foreground-muted)] text-xs">
-            Gérez vos fournisseurs et partenaires commerciaux
+            Gérez vos fournisseurs
           </p>
         </div>
-        <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
+        <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6">
           <div className="text-center text-red-600">
             <Building className="h-12 w-12 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
-            <p className="text-sm text-muted-foreground">{error}</p>
+            <p className="text-sm">{error}</p>
           </div>
         </div>
       </div>
     );
   }
-
   return (
-    <div className="space-y-8 p-4">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-3 sm:p-4 lg:p-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-[var(--color-foreground)] text-xl font-semibold">
+          <h1 className="text-[var(--color-foreground)] text-lg sm:text-xl lg:text-2xl font-semibold">
             Gestion des Fournisseurs
           </h1>
-          <p className="text-[var(--color-foreground-muted)] text-xs">
+          <p className="text-[var(--color-foreground-muted)] text-xs sm:text-sm">
             Gérez vos fournisseurs et partenaires commerciaux
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
-          >
-            <Building className="h-4 w-4 mr-1" />
-            Exporter
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setShowAddForm(true)}
-            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Nouveau Fournisseur
-          </Button>
-        </div>
+        <Button
+          onClick={() => setShowAddForm(true)}
+          className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white flex items-center gap-2 w-full sm:w-auto"
+        >
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">Nouveau Fournisseur</span>
+          <span className="sm:hidden">Ajouter</span>
+        </Button>
       </div>
-      {/* Statistics */}
-      <FournisseursStats stats={stats} />
-      {/* Liste des Fournisseurs */}
-      <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
-        <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
+      {/* List Container */}
+      <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-3 sm:p-4 lg:p-6 w-full">
+        <h2 className="text-sm sm:text-base font-medium text-[var(--color-foreground)] mb-4">
           Liste des Fournisseurs
         </h2>
 
-        {/* Search and Filters Container */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          {/* Search Bar */}
-          <div className="relative flex-1 max-w-md">
+        {/* Search Bar */}
+        <div className="mb-4 sm:mb-6">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-foreground-muted)]" />
             <Input
-              placeholder="Rechercher un fournisseur..."
+              placeholder="Rechercher par nom, ICE, IF, contact ou adresse..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20"
+              className="pl-9 bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-foreground)] placeholder-[var(--color-foreground-muted)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20"
             />
           </div>
-
-          {/* Filters */}
-          <div className="flex items-center gap-3">
-            {/* Status filter */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                <SelectItem
-                  value="all"
-                  className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Tous les statuts
-                </SelectItem>
-                <SelectItem
-                  value="actif"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Actif
-                </SelectItem>
-                <SelectItem
-                  value="inactif"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Inactif
-                </SelectItem>
-                <SelectItem
-                  value="suspendu"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Suspendu
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Type filter */}
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                <SelectItem
-                  value="all"
-                  className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Tous les types
-                </SelectItem>
-                <SelectItem
-                  value="entreprise"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Entreprise
-                </SelectItem>
-                <SelectItem
-                  value="particulier"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Particulier
-                </SelectItem>
-                <SelectItem
-                  value="association"
-                  className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Association
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
-        <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
-          <DataTable
-            columns={columns}
-            data={filteredFournisseurs}
-            loading={loading}
-            onRowClick={handleRowClick}
-            emptyMessage="Aucun fournisseur trouvé. Commencez par ajouter un nouveau fournisseur."
-            rowClassName="cursor-pointer hover:bg-[var(--color-background)]"
-          />
+        {/* Table */}
+        <div className="rounded-lg border border-[var(--color-border)] overflow-hidden overflow-x-auto">
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center gap-2 text-[var(--color-foreground-muted)]">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span className="text-sm">Chargement...</span>
+              </div>
+            </div>
+          ) : filteredFournisseurs.length === 0 ? (
+            <div className="flex items-center justify-center h-64 text-[var(--color-foreground-muted)]">
+              <p className="text-sm">
+                {fournisseurs.length === 0
+                  ? "Aucun fournisseur trouvé. Commencez par en ajouter un."
+                  : "Aucun résultat ne correspond à votre recherche."}
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-[var(--color-background)]">
+                <TableRow className="border-[var(--color-border)]">
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm">
+                    Nom
+                  </TableHead>
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm hidden sm:table-cell">
+                    ICE
+                  </TableHead>
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm hidden md:table-cell">
+                    IF
+                  </TableHead>
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm">
+                    Contact
+                  </TableHead>
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm hidden lg:table-cell">
+                    Adresse
+                  </TableHead>
+                  <TableHead className="text-[var(--color-foreground-muted)] font-semibold text-xs sm:text-sm text-right">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredFournisseurs.map((fournisseur) => (
+                  <TableRow
+                    key={fournisseur.id}
+                    className="border-[var(--color-border)] hover:bg-[var(--color-background)] transition-colors"
+                  >
+                    <TableCell className="text-[var(--color-foreground)] font-medium text-xs sm:text-sm py-3">
+                      {fournisseur.nom}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)] text-xs sm:text-sm hidden sm:table-cell">
+                      {fournisseur.ice || "-"}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)] text-xs sm:text-sm hidden md:table-cell">
+                      {fournisseur.ifNumber || "-"}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)] text-xs sm:text-sm">
+                      {fournisseur.contact || "-"}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)] text-xs sm:text-sm truncate max-w-xs hidden lg:table-cell">
+                      {fournisseur.adresse || "-"}
+                    </TableCell>
+                    <TableCell className="text-right space-x-1 sm:space-x-2 py-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewFournisseur(fournisseur)}
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
+                      >
+                        <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteFournisseur(fournisseur)}
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-[var(--color-red)] hover:bg-opacity-10 hover:text-[var(--color-red)]"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </div>
-      {/* Add Form */}{" "}
-      {showAddForm && (
-        <AddFournisseurForm
-          open={showAddForm}
-          onOpenChange={setShowAddForm}
-          onSubmit={handleAddFournisseur}
-        />
-      )}
-      {/* Fournisseur Detail Modal */}
-      <DetailModal
-        isOpen={showFournisseurModal}
-        onClose={handleCloseFournisseurModal}
-        title="Détail du Fournisseur"
-        size="large"
-      >
-        {" "}
+      {/* Add Form Modal */}
+      <AddFournisseurForm
+        open={showAddForm}
+        onOpenChange={setShowAddForm}
+        onSubmit={handleAddFournisseur}
+      />{" "}
+      {/* Detail Modal */}
+      {selectedFournisseur && (
         <FournisseurDetailModal
           fournisseur={selectedFournisseur}
-          onClose={handleCloseFournisseurModal}
-          onContact={(fournisseur) => {
-            console.log("Contact fournisseur:", fournisseur);
-            // TODO: Implement contact functionality
-          }}
+          open={showDetailModal}
+          onOpenChange={setShowDetailModal}
         />
-      </DetailModal>
+      )}
     </div>
   );
 };

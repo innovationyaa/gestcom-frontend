@@ -9,64 +9,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Building, Loader2 } from "lucide-react";
 
 export function AddFournisseurForm({ open, onOpenChange, onSubmit }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nom: "",
-    email: "",
-    telephone: "",
+    ice: "",
+    ifNumber: "",
+    contact: "",
     adresse: "",
-    codePostal: "",
-    ville: "",
-    pays: "France",
-    type: "entreprise",
-    statut: "actif",
-    siret: "",
-    siteweb: "",
   });
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.nom.trim()) {
-      newErrors.nom = "Le nom est requis";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "L'email est requis";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Format d'email invalide";
-    }
-
-    if (!formData.telephone.trim()) {
-      newErrors.telephone = "Le téléphone est requis";
-    }
-
-    if (!formData.adresse.trim()) {
-      newErrors.adresse = "L'adresse est requise";
-    }
-
-    if (!formData.ville.trim()) {
-      newErrors.ville = "La ville est requise";
-    }
-
-    if (!formData.codePostal.trim()) {
-      newErrors.codePostal = "Le code postal est requis";
-    }
-
-    if (formData.type === "entreprise" && !formData.siret.trim()) {
-      newErrors.siret = "Le SIRET est requis pour les entreprises";
-    }
+    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
+    if (!formData.contact.trim()) newErrors.contact = "Le contact est requis";
+    if (!formData.adresse.trim()) newErrors.adresse = "L'adresse est requise";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -74,14 +35,17 @@ export function AddFournisseurForm({ open, onOpenChange, onSubmit }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
     try {
-      const result = await onSubmit(formData);
+      const payload = {
+        nom: formData.nom,
+        ice: formData.ice,
+        ifNumber: formData.ifNumber,
+        contact: formData.contact,
+        adresse: formData.adresse,
+      };
+      const result = await onSubmit(payload);
       if (result.success) {
         handleReset();
         onOpenChange(false);
@@ -96,32 +60,18 @@ export function AddFournisseurForm({ open, onOpenChange, onSubmit }) {
   };
 
   const handleReset = () => {
-    setFormData({
-      nom: "",
-      email: "",
-      telephone: "",
-      adresse: "",
-      codePostal: "",
-      ville: "",
-      pays: "France",
-      type: "entreprise",
-      statut: "actif",
-      siret: "",
-      siteweb: "",
-    });
+    setFormData({ nom: "", ice: "", ifNumber: "", contact: "", adresse: "" });
     setErrors({});
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: null }));
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[var(--color-surface)] border-[var(--color-border)] max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-[var(--color-surface)] border-[var(--color-border)] max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-[var(--color-foreground)]">
             <Building className="h-5 w-5" />
@@ -129,91 +79,61 @@ export function AddFournisseurForm({ open, onOpenChange, onSubmit }) {
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
+        <form onSubmit={handleSubmit} className="space-y-6 p-4">
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-[var(--color-foreground)]">
-              Informations générales
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="nom">Nom *</Label>
-                <Input
-                  id="nom"
-                  value={formData.nom}
-                  onChange={(e) => handleInputChange("nom", e.target.value)}
-                  className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                    errors.nom ? "border-red-500" : ""
-                  }`}
-                  placeholder="Nom du fournisseur"
-                />
-                {errors.nom && (
-                  <p className="text-xs text-red-500">{errors.nom}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="type">Type *</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value) => handleInputChange("type", value)}
-                >
-                  <SelectTrigger className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                    <SelectItem value="entreprise">Entreprise</SelectItem>
-                    <SelectItem value="particulier">Particulier</SelectItem>
-                    <SelectItem value="association">Association</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="nom">Nom *</Label>
+              <Input
+                id="nom"
+                value={formData.nom}
+                onChange={(e) => handleInputChange("nom", e.target.value)}
+                placeholder="Nom du fournisseur"
+                className={`bg-[var(--color-surface)] border-[var(--color-border)] ${errors.nom ? "border-red-500" : ""}`}
+              />
+              {errors.nom && (
+                <p className="text-xs text-red-500">{errors.nom}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="ice">ICE</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                    errors.email ? "border-red-500" : ""
-                  }`}
-                  placeholder="email@exemple.com"
+                  id="ice"
+                  value={formData.ice}
+                  onChange={(e) => handleInputChange("ice", e.target.value)}
+                  placeholder="ICE"
+                  className="bg-[var(--color-surface)] border-[var(--color-border)]"
                 />
-                {errors.email && (
-                  <p className="text-xs text-red-500">{errors.email}</p>
-                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="telephone">Téléphone *</Label>
+                <Label htmlFor="ifNumber">IF</Label>
                 <Input
-                  id="telephone"
-                  value={formData.telephone}
+                  id="ifNumber"
+                  value={formData.ifNumber}
                   onChange={(e) =>
-                    handleInputChange("telephone", e.target.value)
+                    handleInputChange("ifNumber", e.target.value)
                   }
-                  className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                    errors.telephone ? "border-red-500" : ""
-                  }`}
-                  placeholder="+33 1 23 45 67 89"
+                  placeholder="IF"
+                  className="bg-[var(--color-surface)] border-[var(--color-border)]"
                 />
-                {errors.telephone && (
-                  <p className="text-xs text-red-500">{errors.telephone}</p>
-                )}
               </div>
             </div>
-          </div>
 
-          {/* Address Information */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-[var(--color-foreground)]">
-              Adresse
-            </h3>
+            <div className="space-y-2">
+              <Label htmlFor="contact">Contact *</Label>
+              <Input
+                id="contact"
+                value={formData.contact}
+                onChange={(e) => handleInputChange("contact", e.target.value)}
+                placeholder="Email ou téléphone"
+                className={`bg-[var(--color-surface)] border-[var(--color-border)] ${errors.contact ? "border-red-500" : ""}`}
+              />
+              {errors.contact && (
+                <p className="text-xs text-red-500">{errors.contact}</p>
+              )}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="adresse">Adresse *</Label>
@@ -221,118 +141,13 @@ export function AddFournisseurForm({ open, onOpenChange, onSubmit }) {
                 id="adresse"
                 value={formData.adresse}
                 onChange={(e) => handleInputChange("adresse", e.target.value)}
-                className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                  errors.adresse ? "border-red-500" : ""
-                }`}
                 placeholder="Adresse complète"
                 rows={2}
+                className={`bg-[var(--color-surface)] border-[var(--color-border)] ${errors.adresse ? "border-red-500" : ""}`}
               />
               {errors.adresse && (
                 <p className="text-xs text-red-500">{errors.adresse}</p>
               )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="codePostal">Code Postal *</Label>
-                <Input
-                  id="codePostal"
-                  value={formData.codePostal}
-                  onChange={(e) =>
-                    handleInputChange("codePostal", e.target.value)
-                  }
-                  className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                    errors.codePostal ? "border-red-500" : ""
-                  }`}
-                  placeholder="75001"
-                />
-                {errors.codePostal && (
-                  <p className="text-xs text-red-500">{errors.codePostal}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="ville">Ville *</Label>
-                <Input
-                  id="ville"
-                  value={formData.ville}
-                  onChange={(e) => handleInputChange("ville", e.target.value)}
-                  className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                    errors.ville ? "border-red-500" : ""
-                  }`}
-                  placeholder="Paris"
-                />
-                {errors.ville && (
-                  <p className="text-xs text-red-500">{errors.ville}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="pays">Pays</Label>
-                <Input
-                  id="pays"
-                  value={formData.pays}
-                  onChange={(e) => handleInputChange("pays", e.target.value)}
-                  className="bg-[var(--color-surface)] border-[var(--color-border)]"
-                  placeholder="France"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-[var(--color-foreground)]">
-              Informations complémentaires
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {formData.type === "entreprise" && (
-                <div className="space-y-2">
-                  <Label htmlFor="siret">SIRET *</Label>
-                  <Input
-                    id="siret"
-                    value={formData.siret}
-                    onChange={(e) => handleInputChange("siret", e.target.value)}
-                    className={`bg-[var(--color-surface)] border-[var(--color-border)] ${
-                      errors.siret ? "border-red-500" : ""
-                    }`}
-                    placeholder="12345678901234"
-                  />
-                  {errors.siret && (
-                    <p className="text-xs text-red-500">{errors.siret}</p>
-                  )}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="siteweb">Site Web</Label>
-                <Input
-                  id="siteweb"
-                  type="url"
-                  value={formData.siteweb}
-                  onChange={(e) => handleInputChange("siteweb", e.target.value)}
-                  className="bg-[var(--color-surface)] border-[var(--color-border)]"
-                  placeholder="https://exemple.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="statut">Statut</Label>
-                <Select
-                  value={formData.statut}
-                  onValueChange={(value) => handleInputChange("statut", value)}
-                >
-                  <SelectTrigger className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                    <SelectItem value="actif">Actif</SelectItem>
-                    <SelectItem value="inactif">Inactif</SelectItem>
-                    <SelectItem value="suspendu">Suspendu</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
 

@@ -1,106 +1,82 @@
 import { useState, useEffect } from "react";
-import { FournisseursService } from "../services/fournisseursService";
+import fournisseursService from "@/services/fournisseursService";
 
 export function useFournisseurs() {
   const [fournisseurs, setFournisseurs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState({
-    total: 0,
-    actifs: 0,
-    inactifs: 0,
-    suspendus: 0,
-    totalChiffreAffaires: 0,
-  });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  // Fetch all fournisseurs
+  const fetchFournisseurs = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-
-      const [fournisseursData, statsData] = await Promise.all([
-        FournisseursService.getAllFournisseurs(),
-        FournisseursService.getStats(),
-      ]);
-
-      setFournisseurs(fournisseursData);
-      setStats(statsData);
+      const data = await fournisseursService.getAll();
+      setFournisseurs(data);
     } catch (err) {
-      setError(err.message || "Erreur lors du chargement des fournisseurs");
+      setError(err.message || "Failed to fetch fournisseurs");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const addFournisseur = async (newFournisseur) => {
+  // Fetch on mount
+  useEffect(() => {
+    fetchFournisseurs();
+  }, []);
+
+  // Add new fournisseur
+  const addFournisseur = async (payload) => {
     try {
-      const addedFournisseur =
-        await FournisseursService.addFournisseur(newFournisseur);
-      setFournisseurs((prevFournisseurs) => [
-        addedFournisseur,
-        ...prevFournisseurs,
-      ]);
-
-      // Update stats
-      const newStats = await FournisseursService.getStats();
-      setStats(newStats);
-
-      return { success: true, data: addedFournisseur };
-    } catch (error) {
-      return { success: false, error: error.message };
+      const newFournisseur = await fournisseursService.create(payload);
+      setFournisseurs([...fournisseurs, newFournisseur]);
+      return { success: true, data: newFournisseur };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.message || "Failed to add fournisseur",
+      };
     }
   };
 
-  const updateFournisseur = async (id, updatedData) => {
+  // Update existing fournisseur
+  const updateFournisseur = async (id, payload) => {
     try {
-      const updatedFournisseur = await FournisseursService.updateFournisseur(
-        id,
-        updatedData
-      );
-      setFournisseurs((prevFournisseurs) =>
-        prevFournisseurs.map((f) => (f.id === id ? updatedFournisseur : f))
-      );
-
-      // Update stats
-      const newStats = await FournisseursService.getStats();
-      setStats(newStats);
-
-      return { success: true, data: updatedFournisseur };
-    } catch (error) {
-      return { success: false, error: error.message };
+      const updated = await fournisseursService.update(id, payload);
+      setFournisseurs(fournisseurs.map((f) => (f.id === id ? updated : f)));
+      return { success: true, data: updated };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.message || "Failed to update fournisseur",
+      };
     }
   };
 
+  // Delete fournisseur
   const deleteFournisseur = async (id) => {
     try {
-      await FournisseursService.deleteFournisseur(id);
-      setFournisseurs((prevFournisseurs) =>
-        prevFournisseurs.filter((f) => f.id !== id)
-      );
-
-      // Update stats
-      const newStats = await FournisseursService.getStats();
-      setStats(newStats);
-
+      await fournisseursService.delete(id);
+      setFournisseurs(fournisseurs.filter((f) => f.id !== id));
       return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.message || "Failed to delete fournisseur",
+      };
     }
   };
 
+  // Refresh data
   const refreshData = async () => {
-    await loadData();
+    await fetchFournisseurs();
   };
 
   return {
     fournisseurs,
     loading,
     error,
-    stats,
     addFournisseur,
     updateFournisseur,
     deleteFournisseur,

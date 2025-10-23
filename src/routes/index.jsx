@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/services/authContext";
 
 // Lazy load feature components
 const Stock = lazy(() => import("@/features/stock/pages/Stock"));
@@ -12,6 +14,16 @@ const Fournisseurs = lazy(
 );
 
 const AppRoutes = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[var(--color-background)]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-blue)]"></div>
+      </div>
+    );
+  }
+
   return (
     <Suspense
       fallback={
@@ -23,13 +35,20 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route path="/" element={<AppLayout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="/stock" replace />} />
-          {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="stock" element={<Stock />} />
           <Route path="stock/entrees" element={<StockEntrees />} />
           <Route path="stock/sorties" element={<StockSorties />} />
           <Route path="fournisseurs" element={<Fournisseurs />} />
+
           {/* Placeholder routes for future features */}
           <Route
             path="clients"

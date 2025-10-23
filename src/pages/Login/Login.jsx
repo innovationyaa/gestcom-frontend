@@ -1,40 +1,42 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn, AlertCircle } from "lucide-react";
+import { LogIn, AlertCircle, Loader2 } from "lucide-react";
+import { useAuth } from "@/services/authContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    // TODO: Replace with your actual API call
     try {
-      // Simulated login - replace with actual authentication
       if (!email || !password) {
         setError("Veuillez remplir tous les champs");
         setLoading(false);
         return;
       }
 
-      // Example: await loginAPI(email, password)
-      // For now, just simulate success
-      console.log("Login attempt:", { email, password });
-      
-      // You would store auth token here and redirect to /stock
-      // localStorage.setItem("authToken", response.token);
-      // navigate("/stock");
+      // Call auth context login (will use mock or real service depending on env)
+      await login(email, password);
 
-      setLoading(false);
+      // Redirect to stock after successful login
+      navigate("/stock");
     } catch (err) {
-      setError(err.message || "Erreur de connexion");
+      // err may be Error object or string
+      const message =
+        err?.message || err?.response?.data?.detail || "Erreur de connexion";
+      setError(message);
+    } finally {
       setLoading(false);
     }
   };
@@ -69,11 +71,11 @@ export default function Login() {
             {/* Email Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-[var(--color-foreground)]">
-                Adresse e-mail
+                Adresse e-mail ou nom d'utilisateur
               </label>
               <Input
-                type="email"
-                placeholder="exemple@domaine.com"
+                type="text"
+                placeholder="admin or admin@gestcom.local"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
@@ -100,8 +102,9 @@ export default function Login() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white font-medium py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white font-medium py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {loading ? "Connexion en cours..." : "Se connecter"}
             </Button>
           </form>
@@ -109,7 +112,7 @@ export default function Login() {
           {/* Footer Info */}
           <div className="mt-6 pt-6 border-t border-[var(--color-border)]">
             <p className="text-center text-xs text-[var(--color-foreground-muted)]">
-              Démonstration - Utilisez vos identifiants
+              Démonstration - identifiants: admin / admin
             </p>
           </div>
         </CardContent>
