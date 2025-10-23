@@ -10,14 +10,15 @@ import {
   ChevronRight,
   ChevronDown,
   User,
+  CreditCard,
 } from "lucide-react";
 
 const menuItems = [
-  {
-    title: "Tableau de Bord",
-    href: "/",
-    icon: LayoutDashboard,
-  },
+  // {
+  //   title: "Tableau de Bord",
+  //   href: "/",
+  //   icon: LayoutDashboard,
+  // },
   {
     title: "Gestion du Stock",
     href: "/stock",
@@ -29,15 +30,6 @@ const menuItems = [
     ],
   },
   {
-    title: "Commandes",
-    href: "/commandes",
-    icon: ShoppingCart,
-    items: [
-      { title: "Commandes", href: "/commandes" },
-      { title: "Factures", href: "/commandes/factures" },
-    ],
-  },
-  {
     title: "Fournisseurs",
     href: "/fournisseurs",
     icon: Truck,
@@ -46,6 +38,7 @@ const menuItems = [
     title: "Ventes",
     href: "/sales",
     icon: ShoppingCart,
+    disabled: true,
     items: [
       { title: "Commandes", href: "/sales/orders" },
       { title: "Factures", href: "/sales/invoices" },
@@ -53,18 +46,10 @@ const menuItems = [
     ],
   },
   {
-    title: "Rapports",
-    icon: BarChart3,
-    items: [
-      { title: "Ventes", href: "/reports/sales" },
-      { title: "Stocks", href: "/reports/stock" },
-      { title: "Financier", href: "/reports/financial" },
-    ],
-  },
-  {
-    title: "Paramètres",
-    href: "/settings",
-    icon: Settings,
+    title: "Charges",
+    href: "/charges",
+    icon: CreditCard,
+    disabled: true,
   },
 ];
 
@@ -76,24 +61,30 @@ const MenuItem = ({ item, isActive, onToggle, isOpen }) => {
   return (
     <div className="mb-1">
       <Link
-        to={item.href || "#"}
+        to={item.disabled ? "#" : item.href || "#"}
         onClick={(e) => {
+          if (item.disabled) {
+            e.preventDefault();
+            return;
+          }
           if (hasItems) {
             e.preventDefault();
             onToggle();
           }
         }}
         className={`group flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-colors ${
-          isActive
-            ? "bg-[var(--color-blue)] text-white"
-            : "text-[var(--color-foreground-muted)] hover:bg-[var(--color-background)] hover:text-[var(--color-foreground)]"
+          item.disabled
+            ? "text-[var(--color-foreground-muted)]/50 cursor-not-allowed opacity-50"
+            : isActive
+              ? "bg-[var(--color-blue)] text-white"
+              : "text-[var(--color-foreground-muted)] hover:bg-[var(--color-background)] hover:text-[var(--color-foreground)]"
         }`}
       >
         <div className="flex items-center">
           <Icon className="mr-3 h-5 w-5 flex-shrink-0" />
           <span className="font-medium">{item.title}</span>
         </div>
-        {hasItems && (
+        {hasItems && !item.disabled && (
           <span className="ml-2">
             {isOpen ? (
               <ChevronDown className="h-4 w-4 transition-transform" />
@@ -104,7 +95,7 @@ const MenuItem = ({ item, isActive, onToggle, isOpen }) => {
         )}
       </Link>
 
-      {hasItems && isOpen && (
+      {hasItems && isOpen && !item.disabled && (
         <div className="mt-1 ml-8 space-y-1 overflow-visible">
           {item.items.map((subItem) => {
             const isSubActive = location.pathname === subItem.href;

@@ -3,16 +3,13 @@ import { Suspense, lazy } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 
 // Lazy load feature components
-const Dashboard = lazy(() => import("@/features/dashboard/pages/Dashboard"));
 const Stock = lazy(() => import("@/features/stock/pages/Stock"));
+const Login = lazy(() => import("@/pages/Login/Login"));
 const StockEntrees = lazy(() => import("@/features/stock/pages/StockEntrees"));
 const StockSorties = lazy(() => import("@/features/stock/pages/StockSorties"));
-const Commandes = lazy(() => import("@/features/achats/pages/Achats"));
-const Factures = lazy(() => import("@/features/achats/pages/Factures"));
 const Fournisseurs = lazy(
   () => import("@/features/fournisseurs/pages/Fournisseurs")
 );
-const DatePickerTest = lazy(() => import("@/test/DatePickerTest"));
 
 const AppRoutes = () => {
   return (
@@ -24,16 +21,14 @@ const AppRoutes = () => {
       }
     >
       <Routes>
+        <Route path="/login" element={<Login />} />
+
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Navigate to="/stock" replace />} />
+          {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route path="stock" element={<Stock />} />
           <Route path="stock/entrees" element={<StockEntrees />} />
           <Route path="stock/sorties" element={<StockSorties />} />
-          <Route path="commandes">
-            <Route index element={<Commandes />} />
-            <Route path="factures" element={<Factures />} />
-          </Route>
           <Route path="fournisseurs" element={<Fournisseurs />} />
           {/* Placeholder routes for future features */}
           <Route
@@ -76,9 +71,16 @@ const AppRoutes = () => {
               </div>
             }
           />
-          <Route path="test" element={<DatePickerTest />} />
+          <Route
+            path="charges"
+            element={
+              <div className="p-8 text-center text-muted-foreground">
+                Fonctionnalité Charges (à venir)
+              </div>
+            }
+          />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/stock" replace />} />
       </Routes>
     </Suspense>
   );

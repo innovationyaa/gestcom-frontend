@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Fournisseurs feature provides a comprehensive supplier management system for the GestCom application. It follows the established design system and maintains consistency with other features like Stock, Achats, and Dashboard.
+The Fournisseurs feature provides a comprehensive supplier management system for the GestCom application. It follows the established design system and maintains consistency with other features like Stock and Dashboard.
 
 ## Feature Structure
 
@@ -176,7 +176,6 @@ Main data management hook providing:
 
 - Main page: `/fournisseurs`
 - Accessible from sidebar: "Fournisseurs" item
-- Also available in "Achats" submenu
 
 ### Breadcrumbs
 
@@ -188,7 +187,6 @@ Main data management hook providing:
 ### Sidebar Navigation
 
 - Standalone "Fournisseurs" menu item
-- Also nested under "Achats" section
 - Uses Truck icon for visual identification
 
 ### Design System

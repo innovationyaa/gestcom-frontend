@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import centralDataService from "@/services/centralDataService";
-import { DetailModal, CommandeDetailModal } from "@/components/modals";
+import { DetailModal } from "@/components/modals";
 
 export default function Dashboard() {
   // State for filters and data
@@ -416,26 +416,68 @@ export default function Dashboard() {
             );
           })}{" "}
         </div>
-      </div>
-      {/* Commande Detail Modal */}
+      </div>{" "}
+      {/* Order Detail Modal */}
       <DetailModal
         isOpen={showCommandeModal}
         onClose={handleCloseCommandeModal}
         title="Détail de la Commande"
         size="large"
       >
-        <CommandeDetailModal
-          commande={selectedCommande}
-          onClose={handleCloseCommandeModal}
-          onEdit={(commande) => {
-            console.log("Edit commande:", commande);
-            // TODO: Implement edit functionality
-          }}
-          onDownload={(commande) => {
-            console.log("Download commande:", commande);
-            // TODO: Implement download functionality
-          }}
-        />
+        {selectedCommande && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
+                  Référence
+                </label>
+                <p className="text-[var(--color-foreground)]">
+                  {selectedCommande.reference ||
+                    `CMD-${selectedCommande.id?.toString().padStart(4, "0")}`}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
+                  Fournisseur
+                </label>
+                <p className="text-[var(--color-foreground)]">
+                  {selectedCommande.fournisseur}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
+                  Montant
+                </label>
+                <p className="text-[var(--color-foreground)]">
+                  €
+                  {(
+                    selectedCommande.montantTTC ||
+                    selectedCommande.montantTotal ||
+                    0
+                  ).toFixed(2)}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
+                  Statut
+                </label>
+                <p className="text-[var(--color-foreground)]">
+                  {selectedCommande.statut}
+                </p>
+              </div>
+              {selectedCommande.date && (
+                <div>
+                  <label className="text-sm font-medium text-[var(--color-foreground-muted)]">
+                    Date
+                  </label>
+                  <p className="text-[var(--color-foreground)]">
+                    {selectedCommande.date}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </DetailModal>
     </div>
   );
