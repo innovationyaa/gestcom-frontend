@@ -298,14 +298,12 @@ export default function Stock() {
       {/* Add Product Form Modal */}
       <AddProductForm
         isOpen={isAddProductOpen}
-        onClose={() => setIsAddProductOpen(false)}
-        onSave={async (productData) => {
+        onClose={() => setIsAddProductOpen(false)}        onSave={async (productData) => {
           try {
             await addStockItem(productData);
             // The stock will be refreshed automatically by the useStock hook
           } catch (error) {
             console.error("Error adding product:", error);
-            // You might want to show an error toast here
           }
         }}
       />{" "}
