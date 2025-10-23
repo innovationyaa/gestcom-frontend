@@ -69,51 +69,51 @@ export default function Stock() {
       </div>
     );
   }
-
   return (
-    <div className="space-y-8 p-4">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-3 sm:p-4 lg:p-6">
       {/* En-tête de la page */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-[var(--color-foreground)] text-xl font-semibold">
+          <h1 className="text-[var(--color-foreground)] text-lg sm:text-xl lg:text-2xl font-semibold">
             Gestion du Stock
           </h1>
-          <p className="text-[var(--color-foreground-muted)] text-xs">
+          <p className="text-[var(--color-foreground-muted)] text-xs sm:text-sm">
             Gérez votre inventaire et suivez vos stocks en temps réel
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             variant="outline"
             size="sm"
-            className="ml-2 border-[var(--color-border)]"
+            className="border-[var(--color-border)] flex-1 sm:flex-none"
             onClick={() => setIsImportOpen(true)}
           >
-            <Upload className="h-4 w-4 mr-1" />
-            Importer du stock
+            <Upload className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Importer du stock</span>
+            <span className="sm:hidden">Importer</span>
           </Button>
           <Button
             size="sm"
-            className="ml-2 bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white"
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 text-white flex-1 sm:flex-none"
             onClick={() => setIsAddProductOpen(true)}
           >
-            <Plus className="h-4 w-4 mr-1" />
-            Ajouter un Article
+            <Plus className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Ajouter un Article</span>
+            <span className="sm:hidden">Ajouter</span>
           </Button>
         </div>
       </div>{" "}
       {/* Statistiques */}
-      <StockStats stats={stats} loading={statsLoading} />
-      {/* Liste du Stock */}
-      <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-6 w-full">
-        <h2 className="text-base font-medium text-[var(--color-foreground)] mb-4">
+      <StockStats stats={stats} loading={statsLoading} />      {/* Liste du Stock */}
+      <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm p-3 sm:p-4 lg:p-6 w-full">
+        <h2 className="text-sm sm:text-base font-medium text-[var(--color-foreground)] mb-4">
           Liste du Stock
         </h2>
 
         {/* Search and Filters Container */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-foreground-muted)]" />
             <Input
               placeholder="Rechercher un article..."
@@ -123,14 +123,14 @@ export default function Stock() {
             />
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-3">
+          {/* Filters - Responsive Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:items-center gap-2 sm:gap-3">
             {/* Fournisseur Filter */}
             <Select
               value={filters.fournisseur}
               onValueChange={(value) => updateFilter("fournisseur", value)}
             >
-              <SelectTrigger className="w-[160px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
+              <SelectTrigger className="w-full lg:w-[160px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
                 <SelectValue placeholder="Fournisseur" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -138,7 +138,7 @@ export default function Stock() {
                   value="all"
                   className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
                 >
-                  Tous les fournisseurs
+                  Tous
                 </SelectItem>
                 {getFilterOptions(stockItems, "fournisseur").map(
                   (fournisseur) => (
@@ -159,7 +159,7 @@ export default function Stock() {
               value={filters.categorie}
               onValueChange={(value) => updateFilter("categorie", value)}
             >
-              <SelectTrigger className="w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
+              <SelectTrigger className="w-full lg:w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
                 <SelectValue placeholder="Catégorie" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
@@ -167,7 +167,7 @@ export default function Stock() {
                   value="all"
                   className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
                 >
-                  Toutes les catégories
+                  Toutes
                 </SelectItem>
                 {STOCK_CATEGORIES.map((categorie) => (
                   <SelectItem
@@ -186,7 +186,7 @@ export default function Stock() {
               value={filters.sortBy}
               onValueChange={(value) => updateFilter("sortBy", value)}
             >
-              <SelectTrigger className="w-[120px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
+              <SelectTrigger className="w-full lg:w-[120px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
                 <SelectValue placeholder="Trier" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">

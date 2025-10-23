@@ -129,6 +129,8 @@ export function StockTable({
 
   return (
     <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
+      {/* Desktop Table View - Hidden on mobile */}
+      <div className="hidden lg:block">
       <Table>
         <TableHeader>
           <TableRow className="bg-[var(--color-background)] hover:bg-[var(--color-background)]">
@@ -300,9 +302,131 @@ export function StockTable({
           )}
         </TableBody>
       </Table>
+      </div>
+
+      {/* Mobile Card View - Shown only on mobile */}
+      <div className="lg:hidden divide-y divide-[var(--color-border)]">
+        {pagedItems.length === 0 ? (
+          <div className="text-center py-12 text-[var(--color-foreground-muted)]">
+            Aucun article trouvé
+          </div>
+        ) : (
+          pagedItems.map((item, index) => (
+            <div
+              key={item.id}
+              className="p-4 hover:bg-[var(--color-background)] transition-colors duration-200 cursor-pointer"
+              onClick={() => onRowClick && onRowClick(item)}
+            >
+              <div className="flex gap-3">
+                {/* Image */}
+                <div className="flex-shrink-0">
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.nom}
+                      className="h-16 w-16 object-cover rounded-md border border-[var(--color-border)]"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <Avatar className="h-16 w-16 rounded-md">
+                      <AvatarFallback className="rounded-md bg-[var(--color-background)] text-[var(--color-foreground-muted)]">
+                        <ImageIcon className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  {/* Title and Reference */}
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-sm text-[var(--color-foreground)] truncate">
+                        {item.nom}
+                      </h3>
+                      <p className="text-xs text-[var(--color-foreground-muted)]">
+                        Réf: {item.reference}
+                      </p>
+                    </div>
+                    {getStatusBadge(item.status)}
+                  </div>
+
+                  {/* Description */}
+                  {item.description && (
+                    <p className="text-xs text-[var(--color-foreground-muted)] mb-2 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                    <div>
+                      <span className="text-[var(--color-foreground-muted)]">Catégorie:</span>
+                      <span className="ml-1 text-[var(--color-foreground)]">{item.categorie}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {getStatusIcon(item.status)}
+                      <span className="text-[var(--color-foreground-muted)]">Qté:</span>
+                      <span className="ml-1 font-medium text-[var(--color-foreground)]">
+                        {item.quantite} {item.uniteMesure}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[var(--color-foreground-muted)]">Prix Achat:</span>
+                      <span className="ml-1 text-[var(--color-foreground)]">{item.prixAchatFormatted}</span>
+                    </div>
+                    <div>
+                      <span className="text-[var(--color-foreground-muted)]">Prix Vente:</span>
+                      <span className="ml-1 text-[var(--color-foreground)]">{item.prixVenteFormatted}</span>
+                    </div>
+                  </div>
+
+                  {/* Value and Actions */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs">
+                      <span className="text-[var(--color-foreground-muted)]">Valeur:</span>
+                      <span className="ml-1 font-medium text-[var(--color-blue)]">
+                        {item.valeurStockFormatted}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                        }}
+                        className="h-7 w-7 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement delete functionality
+                        }}
+                        className="h-7 w-7 p-0 hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Pagination */}
       {page && pageSize && (
-        <div className="flex items-center justify-between px-3 py-2 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
-          <div className="text-xs text-[var(--color-foreground-muted)]">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-3 py-3 sm:py-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] gap-3 sm:gap-2">
+          <div className="text-xs text-[var(--color-foreground-muted)] text-center sm:text-left">
             Affichage {(page - 1) * pageSize + (pagedItems.length ? 1 : 0)}–
             {(page - 1) * pageSize + pagedItems.length} sur {total}
           </div>
@@ -326,7 +450,7 @@ export function StockTable({
               >
                 Préc.
               </button>
-              <div className="px-3 py-1 text-xs border border-[var(--color-border)] bg-[var(--color-background)]">
+              <div className="px-2 sm:px-3 py-1 text-xs border border-[var(--color-border)] bg-[var(--color-background)]">
                 {page} / {totalPages}
               </div>
               <button

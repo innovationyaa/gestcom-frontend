@@ -245,13 +245,12 @@ export function StockDetailModal({
     const reasonObj = allReasons.find((r) => r.value === reason);
     return reasonObj ? reasonObj.label : reason;
   };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header avec informations principales */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4">
-          <div className="h-16 w-16 rounded-md overflow-hidden border border-[var(--color-border)] bg-[var(--color-background)] flex items-center justify-center">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+        <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+          <div className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 rounded-md overflow-hidden border border-[var(--color-border)] bg-[var(--color-background)] flex items-center justify-center">
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}
@@ -261,41 +260,40 @@ export function StockDetailModal({
               />
             ) : (
               <div className="text-[var(--color-foreground-muted)]">
-                <Package className="h-6 w-6" />
+                <Package className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
             )}
           </div>
-          <div>
-            <h3 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg sm:text-xl font-semibold text-[var(--color-foreground)] mb-1 sm:mb-2 truncate">
               {item.nom}
             </h3>
-            <div className="flex items-center gap-4 text-sm text-[var(--color-foreground-muted)]">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-[var(--color-foreground-muted)]">
               <div className="flex items-center gap-1">
-                <Tag className="h-4 w-4" />
-                <span>Réf: {item.reference}</span>
+                <Tag className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Réf: {item.reference}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Package className="h-4 w-4" />
-                <span>Catégorie: {item.categorie}</span>
+                <Package className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="truncate">Catégorie: {item.categorie}</span>
               </div>
             </div>
             {item.description && (
-              <p className="text-sm text-[var(--color-foreground-muted)] mt-2">
+              <p className="text-xs sm:text-sm text-[var(--color-foreground-muted)] mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-none">
                 {item.description}
               </p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
           {getStatusBadge(item.status)}
         </div>
-      </div>
-      {/* Stock Adjustment Form */}
+      </div>      {/* Stock Adjustment Form */}
       {showAdjustments && showAdjustmentForm && (
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2 text-blue-800">
-              <History className="h-5 w-5" />
+          <CardHeader className="pb-2 sm:pb-3">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-blue-800">
+              <History className="h-4 w-4 sm:h-5 sm:w-5" />
               Ajustement de Stock
             </CardTitle>
           </CardHeader>{" "}
@@ -472,19 +470,18 @@ export function StockDetailModal({
                     </div>
                   )}
               </div>
-            )}
-            <div className="flex justify-end space-x-3 pt-4 mt-4 border-t border-[#e5f2ff]">
+            )}            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 mt-4 border-t border-[#e5f2ff]">
               <button
                 type="button"
                 onClick={() => setShowAdjustmentForm(false)}
-                className="px-5 py-2.5 text-sm font-medium text-[#3b82f6] bg-white border border-[#e5e5e5] rounded-lg hover:bg-[#f8faff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/30 transition-all duration-200 h-11 flex items-center"
+                className="px-4 sm:px-5 py-2.5 text-sm font-medium text-[#3b82f6] bg-white border border-[#e5e5e5] rounded-lg hover:bg-[#f8faff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/30 transition-all duration-200 h-11 flex items-center justify-center"
               >
                 Annuler
               </button>
               <button
                 type="button"
                 onClick={resetAdjustmentForm}
-                className="px-5 py-2.5 text-sm font-medium text-[#6b7280] bg-white border border-[#e5e5e5] rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500/30 transition-all duration-200 h-11 flex items-center"
+                className="px-4 sm:px-5 py-2.5 text-sm font-medium text-[#6b7280] bg-white border border-[#e5e5e5] rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500/30 transition-all duration-200 h-11 flex items-center justify-center"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Réinitialiser
@@ -493,7 +490,7 @@ export function StockDetailModal({
                 type="button"
                 onClick={handleAdjustmentSubmit}
                 disabled={!adjustment.quantity || !adjustment.reason}
-                className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#3b82f6] to-[#2563eb] border border-transparent rounded-lg hover:from-[#3b82f6]/90 hover:to-[#2563eb]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/50 transition-all duration-200 h-11 flex items-center shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 sm:px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#3b82f6] to-[#2563eb] border border-transparent rounded-lg hover:from-[#3b82f6]/90 hover:to-[#2563eb]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/50 transition-all duration-200 h-11 flex items-center justify-center shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Valider l'ajustement
@@ -501,22 +498,21 @@ export function StockDetailModal({
             </div>
           </CardContent>
         </Card>
-      )}{" "}
-      {/* Actions */}
+      )}{" "}      {/* Actions */}
       {showAdjustments && (
-        <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200/50">
+        <div className="flex items-center gap-2 p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200/50">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowAdjustmentForm(true)}
-            className="flex items-center gap-1 bg-white hover:bg-purple-50 text-purple-700 border-purple-300 hover:border-purple-400"
+            className="flex items-center gap-1 bg-white hover:bg-purple-50 text-purple-700 border-purple-300 hover:border-purple-400 text-xs sm:text-sm w-full sm:w-auto justify-center"
           >
-            <History className="h-4 w-4" />
+            <History className="h-3 w-3 sm:h-4 sm:w-4" />
             Ajustement de stock
           </Button>
         </div>
       )}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
         {/* Informations de Stock */}
         <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200 shadow-sm">
           <CardHeader className="pb-3">
