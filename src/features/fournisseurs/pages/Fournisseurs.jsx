@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Search, Eye, Trash2, Loader2 } from "lucide-react";
+import { Plus, Search, Eye, Trash2, Loader2, Edit2 } from "lucide-react";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -17,12 +17,15 @@ import {
 import { AddFournisseurForm } from "../components/AddFournisseurForm";
 import { useFournisseurs } from "../hooks/useFournisseurs";
 import { FournisseurDetailModal } from "@/components/modals";
+import FournisseurEditModal from "../components/FournisseurEditModal";
+import fournisseursService from "@/services/fournisseursService";
 
 export const Fournisseurs = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFournisseur, setSelectedFournisseur] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const { fournisseurs, loading, error, addFournisseur, deleteFournisseur } =
     useFournisseurs();
 
@@ -64,6 +67,27 @@ export const Fournisseurs = () => {
   const handleViewFournisseur = (fournisseur) => {
     setSelectedFournisseur(fournisseur);
     setShowDetailModal(true);
+  };
+
+  const handleEditFournisseur = (fournisseur) => {
+    setSelectedFournisseur(fournisseur);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveFournisseur = async (updatedFields) => {
+    // Call your update service here, e.g. fournisseursService.update
+    // Only send allowed fields
+    await fournisseursService.update(selectedFournisseur.id, updatedFields);
+    setEditModalOpen(false);
+    setSelectedFournisseur(null);
+    fetchFournisseurs();
+  };
+
+  const fetchFournisseurs = () => {
+    // If useFournisseurs exposes a refetch or reload, call it here
+    if (typeof window !== "undefined") {
+      window.location.reload(); // fallback: reload page to refresh data
+    }
   };
 
   if (error) {
@@ -201,6 +225,14 @@ export const Fournisseurs = () => {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => handleEditFournisseur(fournisseur)}
+                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
+                      >
+                        <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleDeleteFournisseur(fournisseur)}
                         className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-[var(--color-red)] hover:bg-opacity-10 hover:text-[var(--color-red)]"
                       >
@@ -228,6 +260,13 @@ export const Fournisseurs = () => {
           onOpenChange={setShowDetailModal}
         />
       )}
+      {/* Edit Modal */}
+      <FournisseurEditModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        fournisseur={selectedFournisseur}
+        onSave={handleSaveFournisseur}
+      />
     </div>
   );
 };

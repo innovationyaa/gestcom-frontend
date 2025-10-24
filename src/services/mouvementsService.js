@@ -2,10 +2,10 @@ import axios from "axios";
 
 /**
  * Stock Movements service - Direct backend integration
- * Connects to: http://127.0.0.1:8000/api/stock/mouvements/
+ * Connects to: VITE_BACKEND_URL from .env
  */
 
-const BACKEND_URL = "http://127.0.0.1:8000/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const directApi = axios.create({
   baseURL: BACKEND_URL,
@@ -60,7 +60,11 @@ const mouvementsService = {
   getAll: async () => {
     try {
       const response = await directApi.get("/stock/mouvements/");
-      return response.data.map(normalizeMouvement);
+      // Handle paginated and non-paginated responses
+      const mouvements = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+      return mouvements.map(normalizeMouvement);
     } catch (error) {
       console.error("Failed to fetch mouvements:", error);
       throw new Error(

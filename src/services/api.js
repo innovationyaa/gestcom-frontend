@@ -5,8 +5,10 @@ import axios from "axios";
  * Automatically adds auth token to requests.
  */
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
+  BACKEND_URL ||
   (typeof process !== "undefined" && process.env?.REACT_APP_API_URL) ||
   "http://localhost:8000/api";
 
@@ -43,4 +45,5 @@ api.interceptors.response.use(
   }
 );
 
+export { BACKEND_URL };
 export default api;

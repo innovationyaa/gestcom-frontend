@@ -2,10 +2,10 @@ import axios from "axios";
 
 /**
  * Articles service - Direct backend integration
- * Connects to: http://127.0.0.1:8000/api/stock/articles/
+ * Connects to: VITE_BACKEND_URL from .env
  */
 
-const BACKEND_URL = "http://127.0.0.1:8000/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const directApi = axios.create({
   baseURL: BACKEND_URL,
@@ -64,7 +64,11 @@ const articlesService = {
   getAll: async () => {
     try {
       const response = await directApi.get("/stock/articles/");
-      return response.data.map(normalizeArticle);
+      // Handle paginated and non-paginated responses
+      const articles = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+      return articles.map(normalizeArticle);
     } catch (error) {
       console.error("Failed to fetch articles:", error);
       throw new Error(

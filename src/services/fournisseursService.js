@@ -1,15 +1,18 @@
 import axios from "axios";
 
 /**
- * Fournisseurs service - Direct Django backend connection
- * Backend URL: http://127.0.0.1:8000/api/fournisseurs/
- *
- * Field Mapping (Backend ↔ Frontend):
- * - if_fiscal ↔ ifNumber
- * - date_creation ↔ dateCreation
+ * Fournisseurs service - Direct backend integration
+ * Connects to: VITE_BACKEND_URL from .env
  */
 
-const BACKEND_URL = "http://127.0.0.1:8000/api";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+const directApi = axios.create({
+  baseURL: BACKEND_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 /**
  * Normalize backend response (snake_case → camelCase)
@@ -55,7 +58,7 @@ const fournisseursService = {
    */
   getAll: async (params = {}) => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/fournisseurs/`, {
+      const response = await directApi.get(`/fournisseurs/`, {
         params,
       });
 
@@ -76,7 +79,7 @@ const fournisseursService = {
    */
   getById: async (id) => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/fournisseurs/${id}/`);
+      const response = await directApi.get(`/fournisseurs/${id}/`);
       return normalizeFournisseur(response.data);
     } catch (error) {
       console.error("Failed to fetch fournisseur:", error);
@@ -92,10 +95,7 @@ const fournisseursService = {
   create: async (payload) => {
     try {
       const denormalized = denormalizeFournisseur(payload);
-      const response = await axios.post(
-        `${BACKEND_URL}/fournisseurs/`,
-        denormalized
-      );
+      const response = await directApi.post(`/fournisseurs/`, denormalized);
       return normalizeFournisseur(response.data);
     } catch (error) {
       console.error("Failed to create fournisseur:", error);
@@ -112,8 +112,8 @@ const fournisseursService = {
   update: async (id, payload) => {
     try {
       const denormalized = denormalizeFournisseur(payload);
-      const response = await axios.put(
-        `${BACKEND_URL}/fournisseurs/${id}/`,
+      const response = await directApi.put(
+        `/fournisseurs/${id}/`,
         denormalized
       );
       return normalizeFournisseur(response.data);
@@ -132,8 +132,8 @@ const fournisseursService = {
   partialUpdate: async (id, payload) => {
     try {
       const denormalized = denormalizeFournisseur(payload);
-      const response = await axios.patch(
-        `${BACKEND_URL}/fournisseurs/${id}/`,
+      const response = await directApi.patch(
+        `/fournisseurs/${id}/`,
         denormalized
       );
       return normalizeFournisseur(response.data);
@@ -150,7 +150,7 @@ const fournisseursService = {
    */
   delete: async (id) => {
     try {
-      await axios.delete(`${BACKEND_URL}/fournisseurs/${id}/`);
+      await directApi.delete(`/fournisseurs/${id}/`);
       return true;
     } catch (error) {
       console.error("Failed to delete fournisseur:", error);
