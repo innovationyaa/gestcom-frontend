@@ -15,18 +15,23 @@ import { StockStats } from "../components/StockStats";
 import { StockTable } from "../components/StockTable";
 import { AddProductForm } from "../components/AddProductForm";
 import { useStock, useStockStats, useStockFilters } from "../hooks/useStock";
-import { STOCK_CATEGORIES, SORT_OPTIONS } from "../utils/constants";
+import { useArticles } from "../hooks/useArticles";
+import { SORT_OPTIONS } from "../utils/constants";
 import { getFilterOptions } from "../utils/stockHelpers";
-import { DetailModal, StockDetailModal } from "@/components/modals";
+import { DetailModal } from "@/components/modals";
+import { StockDetailModal } from "../components/StockDetailModal";
 import stockAdjustmentService from "../services/stockAdjustmentService";
 import ImportStockModal from "../components/ImportStockModal";
 
 export default function Stock() {
-  const { stockItems, loading, error, addStockItem, setStockItems } =
-    useStock();
+  const { stockItems, loading, error, addStockItem } = useStock();
   const { stats, loading: statsLoading } = useStockStats();
   const { filters, filteredItems, updateFilter, resetFilters } =
     useStockFilters(stockItems);
+
+  // Get delete function from useArticles
+  const { articles, deleteArticle } = useArticles();
+
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -45,9 +50,23 @@ export default function Stock() {
     setSelectedItem(item);
     setShowStockModal(true);
   };
+
   const handleCloseStockModal = () => {
     setShowStockModal(false);
     setSelectedItem(null);
+  };
+
+  // Delete article handler
+  const handleDeleteArticle = async (articleId) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
+      const result = await deleteArticle(articleId);
+      if (result.success) {
+        // Success feedback (optional)
+        console.log("Article deleted successfully");
+      } else {
+        alert(`Erreur: ${result.error}`);
+      }
+    }
   };
 
   if (error) {
@@ -87,6 +106,7 @@ export default function Stock() {
             size="sm"
             className="border-[var(--color-border)] flex-1 sm:flex-none"
             onClick={() => setIsImportOpen(true)}
+            disabled
           >
             <Upload className="h-4 w-4 sm:mr-1" />
             <span className="hidden sm:inline">Importer du stock</span>
@@ -121,10 +141,9 @@ export default function Stock() {
               onChange={(e) => updateFilter("search", e.target.value)}
               className="pl-9 bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20"
             />
-          </div>
-
+          </div>{" "}
           {/* Filters - Responsive Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:items-center gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:flex lg:items-center gap-2 sm:gap-3">
             {/* Fournisseur Filter */}
             <Select
               value={filters.fournisseur}
@@ -151,33 +170,6 @@ export default function Stock() {
                     </SelectItem>
                   )
                 )}
-              </SelectContent>
-            </Select>
-
-            {/* Catégorie Filter */}
-            <Select
-              value={filters.categorie}
-              onValueChange={(value) => updateFilter("categorie", value)}
-            >
-              <SelectTrigger className="w-full lg:w-[140px] bg-[var(--color-surface)] border-[var(--color-border)] focus:border-[var(--color-blue)] focus:ring-2 focus:ring-[var(--color-blue)]/20">
-                <SelectValue placeholder="Catégorie" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--color-surface)] border-[var(--color-border)]">
-                <SelectItem
-                  value="all"
-                  className="text-[var(--color-foreground-muted)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                >
-                  Toutes
-                </SelectItem>
-                {STOCK_CATEGORIES.map((categorie) => (
-                  <SelectItem
-                    key={categorie}
-                    value={categorie}
-                    className="text-[var(--color-foreground)] focus:bg-[var(--color-blue)] focus:bg-opacity-10 focus:text-[var(--color-blue)]"
-                  >
-                    {categorie}
-                  </SelectItem>
-                ))}
               </SelectContent>
             </Select>
 
@@ -223,6 +215,7 @@ export default function Stock() {
               sortBy={filters.sortBy}
               sortOrder={filters.sortOrder}
               onRowClick={handleStockItemClick}
+              onDelete={handleDeleteArticle}
               page={page}
               pageSize={pageSize}
               onPageChange={setPage}
@@ -301,10 +294,15 @@ export default function Stock() {
         onClose={() => setIsAddProductOpen(false)}
         onSave={async (productData) => {
           try {
-            await addStockItem(productData);
+            const result = await addStockItem(productData);
             // The stock will be refreshed automatically by the useStock hook
+            return result;
           } catch (error) {
             console.error("Error adding product:", error);
+            return {
+              success: false,
+              error: error.message || "Erreur lors de l'ajout du produit",
+            };
           }
         }}
       />{" "}

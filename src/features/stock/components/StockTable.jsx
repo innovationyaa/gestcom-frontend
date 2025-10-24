@@ -31,6 +31,7 @@ export function StockTable({
   sortBy,
   sortOrder,
   onRowClick,
+  onDelete,
   page,
   pageSize,
   onPageChange,
@@ -50,6 +51,14 @@ export function StockTable({
   const [editingItem, setEditingItem] = useState(null);
 
   const handleEditClose = () => setEditingItem(null);
+
+  // Calculate stock status based on quantiteActuelle and seuilMinimum
+  const getStockStatus = (item) => {
+    if (item.quantiteActuelle === 0) return STOCK_STATUS.OUT_OF_STOCK;
+    if (item.quantiteActuelle <= item.seuilMinimum)
+      return STOCK_STATUS.LOW_STOCK;
+    return STOCK_STATUS.IN_STOCK;
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -131,177 +140,191 @@ export function StockTable({
     <div className="rounded-lg border border-[var(--color-border)] overflow-hidden">
       {/* Desktop Table View - Hidden on mobile */}
       <div className="hidden lg:block">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-[var(--color-background)] hover:bg-[var(--color-background)]">
-            <TableHead className="w-[56px] px-4" />
-            <TableHead className="w-[120px] px-4 text-[var(--color-foreground)] font-semibold">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("reference")}
-                className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
-              >
-                Référence
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="min-w-[200px] px-4 text-[var(--color-foreground)] font-semibold">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("nom")}
-                className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
-              >
-                Nom / Description
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="min-w-[150px] px-4 text-[var(--color-foreground)] font-semibold">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("categorie")}
-                className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
-              >
-                Catégorie
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
-              <Button
-                variant="ghost"
-                onClick={() => handleSort("quantite")}
-                className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
-              >
-                Quantité
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="min-w-[80px] px-4 text-[var(--color-foreground)] font-semibold">
-              Unité
-            </TableHead>
-            <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
-              Prix Achat
-            </TableHead>
-            <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
-              Prix Vente
-            </TableHead>
-            <TableHead className="min-w-[120px] px-4 text-right text-[var(--color-foreground)] font-semibold">
-              Valeur Stock
-            </TableHead>
-            <TableHead className="min-w-[120px] px-4 text-[var(--color-foreground)] font-semibold">
-              Statut
-            </TableHead>
-            <TableHead className="w-[120px] px-4 text-right text-[var(--color-foreground)] font-semibold">
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pagedItems.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={10}
-                className="text-center py-12 text-[var(--color-foreground-muted)]"
-              >
-                Aucun article trouvé
-              </TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-[var(--color-background)] hover:bg-[var(--color-background)]">
+              <TableHead className="w-[56px] px-4" />
+              <TableHead className="w-[120px] px-4 text-[var(--color-foreground)] font-semibold">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("reference")}
+                  className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
+                >
+                  Référence
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[200px] px-4 text-[var(--color-foreground)] font-semibold">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("nom")}
+                  className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
+                >
+                  Nom / Description
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[150px] px-4 text-[var(--color-foreground)] font-semibold">
+                Fournisseur
+              </TableHead>
+              <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("quantiteActuelle")}
+                  className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
+                >
+                  Quantité
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("prixAchat")}
+                  className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
+                >
+                  Prix Achat
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[100px] px-4 text-right text-[var(--color-foreground)] font-semibold">
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("prixVente")}
+                  className="h-auto p-0 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-blue)] hover:bg-transparent"
+                >
+                  Prix Vente
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[120px] px-4 text-right text-[var(--color-foreground)] font-semibold">
+                Valeur Stock
+              </TableHead>
+              <TableHead className="min-w-[120px] px-4 text-[var(--color-foreground)] font-semibold">
+                Statut
+              </TableHead>
+              <TableHead className="w-[120px] px-4 text-right text-[var(--color-foreground)] font-semibold">
+                Actions
+              </TableHead>
             </TableRow>
-          ) : (
-            pagedItems.map((item, index) => (
-              <TableRow
-                key={item.id}
-                className={`hover:bg-[var(--color-background)] transition-colors duration-200 cursor-pointer ${
-                  index % 2 === 0
-                    ? "bg-[var(--color-surface)]"
-                    : "bg-[var(--color-background)]"
-                }`}
-                onClick={() => onRowClick && onRowClick(item)}
-              >
-                <TableCell className="px-4">
-                  <div className="h-10 w-10">
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.nom}
-                        className="h-10 w-10 object-cover rounded-md border border-[var(--color-border)]"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <Avatar className="h-10 w-10 rounded-md">
-                        <AvatarFallback className="rounded-md bg-[var(--color-background)] text-[var(--color-foreground-muted)]">
-                          <ImageIcon className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium text-[var(--color-foreground)]">
-                  {item.reference}
-                </TableCell>
-                <TableCell className="text-[var(--color-foreground)]">
-                  <div>
-                    <div className="font-medium text-[var(--color-foreground)]">
-                      {item.nom}
-                    </div>
-                    <div className="text-sm text-[var(--color-foreground-muted)]">
-                      {item.description}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-[var(--color-foreground)]">
-                  {item.categorie}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2 text-[var(--color-foreground)]">
-                    {getStatusIcon(item.status)}
-                    <span className="font-medium">{item.quantite}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-[var(--color-foreground-muted)]">
-                  {item.uniteMesure}
-                </TableCell>
-                <TableCell className="text-right text-[var(--color-foreground)]">
-                  {item.prixAchatFormatted}
-                </TableCell>
-                <TableCell className="text-right text-[var(--color-foreground)]">
-                  {item.prixVenteFormatted}
-                </TableCell>
-                <TableCell className="text-right text-[var(--color-foreground)]">
-                  {item.valeurStockFormatted}
-                </TableCell>
-                <TableCell>{getStatusBadge(item.status)}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // TODO: Implement delete functionality
-                      }}
-                      className="hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingItem(item);
-                      }}
-                      className="hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
+          </TableHeader>
+          <TableBody>
+            {pagedItems.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={10}
+                  className="text-center py-12 text-[var(--color-foreground-muted)]"
+                >
+                  Aucun article trouvé
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              pagedItems.map((item, index) => {
+                const status = getStockStatus(item);
+                const valeurStock = (
+                  item.quantiteActuelle * item.prixAchat
+                ).toFixed(2);
+
+                return (
+                  <TableRow
+                    key={item.id}
+                    className={`hover:bg-[var(--color-background)] transition-colors duration-200 cursor-pointer ${
+                      index % 2 === 0
+                        ? "bg-[var(--color-surface)]"
+                        : "bg-[var(--color-background)]"
+                    }`}
+                    onClick={() => onRowClick && onRowClick(item)}
+                  >
+                    <TableCell className="px-4">
+                      <div className="h-10 w-10">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.nom}
+                            className="h-10 w-10 object-cover rounded-md border border-[var(--color-border)]"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Avatar className="h-10 w-10 rounded-md">
+                            <AvatarFallback className="rounded-md bg-[var(--color-background)] text-[var(--color-foreground-muted)]">
+                              <ImageIcon className="h-4 w-4" />
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-[var(--color-foreground)]">
+                      {item.reference}
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)]">
+                      <div>
+                        <div className="font-medium text-[var(--color-foreground)]">
+                          {item.nom}
+                        </div>
+                        {item.description && (
+                          <div className="text-sm text-[var(--color-foreground-muted)]">
+                            {item.description}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-[var(--color-foreground)]">
+                      {item.fournisseur?.nom || "-"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2 text-[var(--color-foreground)]">
+                        {getStatusIcon(status)}
+                        <span className="font-medium">
+                          {item.quantiteActuelle}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right text-[var(--color-foreground)]">
+                      {item.prixAchat.toFixed(2)} MAD
+                    </TableCell>
+                    <TableCell className="text-right text-[var(--color-foreground)]">
+                      {item.prixVente.toFixed(2)} MAD
+                    </TableCell>
+                    <TableCell className="text-right text-[var(--color-foreground)]">
+                      {valeurStock} MAD
+                    </TableCell>
+                    <TableCell>{getStatusBadge(status)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onDelete) {
+                              onDelete(item.id);
+                            }
+                          }}
+                          className="hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingItem(item);
+                          }}
+                          className="hover:bg-[var(--color-blue)] hover:bg-opacity-10 hover:text-[var(--color-blue)]"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile Card View - Shown only on mobile */}
@@ -363,32 +386,49 @@ export function StockTable({
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 gap-2 text-xs mb-2">
                     <div>
-                      <span className="text-[var(--color-foreground-muted)]">Catégorie:</span>
-                      <span className="ml-1 text-[var(--color-foreground)]">{item.categorie}</span>
+                      <span className="text-[var(--color-foreground-muted)]">
+                        Fournisseur:
+                      </span>
+                      <span className="ml-1 text-[var(--color-foreground)]">
+                        {item.fournisseur?.nom || "-"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       {getStatusIcon(item.status)}
-                      <span className="text-[var(--color-foreground-muted)]">Qté:</span>
+                      <span className="text-[var(--color-foreground-muted)]">
+                        Qté:
+                      </span>
                       <span className="ml-1 font-medium text-[var(--color-foreground)]">
-                        {item.quantite} {item.uniteMesure}
+                        {item.quantiteActuelle} {item.uniteMesure}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[var(--color-foreground-muted)]">Prix Achat:</span>
-                      <span className="ml-1 text-[var(--color-foreground)]">{item.prixAchatFormatted}</span>
+                      <span className="text-[var(--color-foreground-muted)]">
+                        Prix Achat:
+                      </span>
+                      <span className="ml-1 text-[var(--color-foreground)]">
+                        {item.prixAchat.toFixed(2)} MAD
+                      </span>
                     </div>
                     <div>
-                      <span className="text-[var(--color-foreground-muted)]">Prix Vente:</span>
-                      <span className="ml-1 text-[var(--color-foreground)]">{item.prixVenteFormatted}</span>
+                      <span className="text-[var(--color-foreground-muted)]">
+                        Prix Vente:
+                      </span>
+                      <span className="ml-1 text-[var(--color-foreground)]">
+                        {item.prixVente.toFixed(2)} MAD
+                      </span>
                     </div>
                   </div>
 
                   {/* Value and Actions */}
                   <div className="flex items-center justify-between">
                     <div className="text-xs">
-                      <span className="text-[var(--color-foreground-muted)]">Valeur:</span>
+                      <span className="text-[var(--color-foreground-muted)]">
+                        Valeur:
+                      </span>
                       <span className="ml-1 font-medium text-[var(--color-blue)]">
-                        {item.valeurStockFormatted}
+                        {(item.quantiteActuelle * item.prixAchat).toFixed(2)}{" "}
+                        MAD
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -408,7 +448,9 @@ export function StockTable({
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // TODO: Implement delete functionality
+                          if (onDelete) {
+                            onDelete(item.id);
+                          }
                         }}
                         className="h-7 w-7 p-0 hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
                       >

@@ -4,23 +4,26 @@ import { DetailModal } from "@/components/modals";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import centralDataService from "@/services/centralDataService";
-import stockAdjustmentService from "../services/stockAdjustmentService";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, AlertTriangle } from "lucide-react";
+import { useArticles } from "../hooks/useArticles";
+import { useMouvements } from "../hooks/useMouvements";
 
 const REASONS = [
   { value: "vente", label: "Vente" },
-  { value: "perte", label: "Perte" },
-  { value: "casse", label: "Casse" },
-  { value: "correction", label: "Correction" },
-  { value: "echantillon", label: "Échantillon" },
-  { value: "autre", label: "Autre" },
+  { value: "utilisation_interne", label: "Utilisation interne" },
+  { value: "perte_casse", label: "Perte/Casse" },
+  { value: "vol", label: "Vol/Perte inexpliquée" },
+  { value: "peremption", label: "Péremption/Obsolescence" },
+  { value: "ajustement_negatif", label: "Ajustement inventaire (-)" },
+  { value: "transfert_sortie", label: "Transfert sortant" },
+  { value: "retour_fournisseur", label: "Retour fournisseur" },
+  { value: "autre_sortie", label: "Autre motif de sortie" },
 ];
 
 export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
+  const { articles } = useArticles();
+  const { addExit } = useMouvements();
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState([]);
   const [form, setForm] = useState({
     articleId: "",
     quantity: "",
@@ -30,83 +33,88 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
   });
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const load = async () => {
-      const stock = await centralDataService.getStock();
-      // sort by reference asc for usability
-      setItems(
-        (stock || [])
-          .slice()
-          .sort((a, b) => (a.reference || "").localeCompare(b.reference || ""))
-      );
-    };
-    load();
-  }, [isOpen]);
+  // Sort articles by reference
+  const sortedArticles = useMemo(() => {
+    return [...articles].sort((a, b) =>
+      (a.reference || "").localeCompare(b.reference || "")
+    );
+  }, [articles]);
 
   const selectedItem = useMemo(
-    () => items.find((it) => String(it.id) === String(form.articleId)),
-    [items, form.articleId]
+    () => articles.find((it) => String(it.id) === String(form.articleId)),
+    [articles, form.articleId]
   );
 
   const qtyNum = useMemo(
     () => parseInt(form.quantity, 10) || 0,
     [form.quantity]
   );
+
+  const currentStock =
+    selectedItem?.quantiteActuelle || selectedItem?.quantite || 0;
   const projected = useMemo(() => {
     if (!selectedItem) return null;
-    return selectedItem.quantite - qtyNum;
-  }, [selectedItem, qtyNum]);
+    return currentStock - qtyNum;
+  }, [selectedItem, currentStock, qtyNum]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setError(""); // Clear error on change
   };
-
   const submit = async () => {
     setError("");
+
+    // Validation
     if (!form.articleId) return setError("Veuillez choisir un article.");
-    if (qtyNum <= 0) return setError("Quantité invalide.");
-    if (!form.reason) return setError("Motif requis.");
-    if (selectedItem && qtyNum > selectedItem.quantite) {
-      return setError("Stock insuffisant pour cette sortie.");
+    if (qtyNum <= 0) return setError("La quantité doit être supérieure à 0.");
+    if (!form.reason) return setError("Le motif est requis.");
+    if (selectedItem && qtyNum > currentStock) {
+      return setError(`Stock insuffisant. Disponible: ${currentStock}`);
     }
 
-    const payload = {
-      type: "sortie",
-      quantity: qtyNum,
-      reason: form.reason,
-      reference: form.reference,
-      notes: form.notes,
-      user: "Admin User",
-    };
-
-    const validation = stockAdjustmentService.validateAdjustment(payload);
-    if (!validation.isValid) {
-      return setError(validation.errors.join("\n"));
-    }
+    // Build remarque from reason and notes
+    const remarque = [
+      REASONS.find((r) => r.value === form.reason)?.label || form.reason,
+      form.reference ? `Réf: ${form.reference}` : "",
+      form.notes || "",
+    ]
+      .filter(Boolean)
+      .join(" - ");
 
     try {
       setLoading(true);
-      const result = await stockAdjustmentService.addStockMovement(
-        Number(form.articleId),
-        payload
+      const result = await addExit(
+        parseInt(form.articleId, 10),
+        qtyNum,
+        remarque
       );
-      if (onSuccess) onSuccess(result);
-      onClose?.();
-      setForm({
-        articleId: "",
-        quantity: "",
-        reason: "vente",
-        reference: "",
-        notes: "",
-      });
+
+      if (result.success) {
+        // Reset form
+        setForm({
+          articleId: "",
+          quantity: "",
+          reason: "vente",
+          reference: "",
+          notes: "",
+        });
+        onSuccess?.();
+        onClose?.();
+      } else {
+        setError(result.error || "Erreur lors de l'enregistrement.");
+      }
     } catch (e) {
       setError(e.message || "Erreur lors de l'enregistrement.");
     } finally {
       setLoading(false);
     }
   };
+
+  const isLowStock =
+    selectedItem &&
+    projected !== null &&
+    projected < (selectedItem.seuilMinimum || 0);
 
   return (
     <DetailModal
@@ -119,21 +127,20 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto -mx-2 px-2">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-[#171717]">
-              Article
+              Article <span className="text-[#ef4444]">*</span>
             </Label>
             <div className="relative">
               <select
                 name="articleId"
                 value={form.articleId}
                 onChange={onChange}
-                className="w-full h-11 pl-3 pr-8 text-sm border border-[#e0e7ff] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/30 focus:border-[#3b82f6] appearance-none bg-[#f8faff] transition-all duration-200"
+                className="w-full h-11 pl-3 pr-8 text-sm border border-[#fee2e2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ef4444]/30 focus:border-[#ef4444] appearance-none bg-[#fef2f2] transition-all duration-200"
               >
-                <option value="" disabled>
-                  Sélectionner un article
-                </option>
-                {items.map((it) => (
+                <option value="">Sélectionner un article</option>
+                {sortedArticles.map((it) => (
                   <option key={it.id} value={it.id}>
-                    {it.reference} — {it.nom}
+                    {it.reference} — {it.nom} (Stock:{" "}
+                    {it.quantiteActuelle || it.quantite || 0})
                   </option>
                 ))}
               </select>
@@ -143,39 +150,45 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
 
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-[#171717]">
-              Quantité à sortir
+              Quantité à sortir <span className="text-[#ef4444]">*</span>
             </Label>
             <Input
               type="number"
               min="1"
+              max={currentStock}
               name="quantity"
               value={form.quantity}
               onChange={onChange}
               placeholder="0"
-              className="w-full border-[#e0e7ff] focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f8faff] px-3.5 focus:outline-none focus:ring-offset-1 focus:ring-offset-transparent"
+              className="w-full border-[#fee2e2] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#fef2f2] px-3.5 focus:outline-none"
             />
             {selectedItem && (
-              <p className="mt-1 text-xs text-[var(--color-foreground-muted)]">
-                Stock actuel: {selectedItem.quantite} • Après sortie:{" "}
-                {projected}
-                {projected < 0 && (
-                  <span className="text-[var(--color-error)]">
-                    {" "}
-                    (insuffisant)
-                  </span>
+              <div className="mt-1 space-y-1">
+                <p className="text-xs text-orange-700 bg-orange-50 rounded px-2 py-1">
+                  Stock actuel: {currentStock} • Après sortie:{" "}
+                  <span className="font-semibold">{projected}</span>
+                </p>
+                {isLowStock && (
+                  <p className="text-xs text-red-700 bg-red-50 rounded px-2 py-1 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Attention: Stock en dessous du seuil minimum (
+                    {selectedItem.seuilMinimum})
+                  </p>
                 )}
-              </p>
+              </div>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-[#171717]">Motif</Label>
+            <Label className="text-sm font-medium text-[#171717]">
+              Motif <span className="text-[#ef4444]">*</span>
+            </Label>
             <div className="relative">
               <select
                 name="reason"
                 value={form.reason}
                 onChange={onChange}
-                className="w-full h-11 pl-3 pr-8 text-sm border border-[#e0e7ff] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/30 focus:border-[#3b82f6] appearance-none bg-[#f8faff] transition-all duration-200"
+                className="w-full h-11 pl-3 pr-8 text-sm border border-[#fee2e2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ef4444]/30 focus:border-[#ef4444] appearance-none bg-[#fef2f2] transition-all duration-200"
               >
                 {REASONS.map((r) => (
                   <option key={r.value} value={r.value}>
@@ -189,14 +202,14 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
 
           <div className="space-y-1.5">
             <Label className="text-sm font-medium text-[#171717]">
-              Référence (document)
+              Référence document
             </Label>
             <Input
               name="reference"
               value={form.reference}
               onChange={onChange}
-              placeholder="N° document, bon de sortie, etc."
-              className="w-full border-[#e0e7ff] focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f8faff] px-3.5 focus:outline-none focus:ring-offset-1 focus:ring-offset-transparent"
+              placeholder="N° facture, bon de sortie, etc."
+              className="w-full border-[#fee2e2] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#fef2f2] px-3.5 focus:outline-none"
             />
           </div>
 
@@ -206,25 +219,23 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
               name="notes"
               value={form.notes}
               onChange={onChange}
-              placeholder="Notes complémentaires"
-              className="w-full border-[#e0e7ff] focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/30 rounded-lg text-sm transition-all duration-200 bg-[#f8faff] min-h-[100px] p-3.5 focus:outline-none"
+              placeholder="Notes complémentaires (optionnel)"
+              className="w-full border-[#fee2e2] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/30 rounded-lg text-sm transition-all duration-200 bg-[#fef2f2] min-h-[100px] p-3.5 focus:outline-none resize-none"
               rows={3}
             />
           </div>
         </div>
-
         {error && (
-          <div className="text-sm text-[var(--color-error)] bg-red-50 border border-red-200 rounded-md px-3 py-2">
+          <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
             {error}
           </div>
-        )}
-
-        <div className="flex justify-end space-x-3 pt-6 mt-2 border-t border-[#e5f2ff] md:col-span-2">
+        )}{" "}
+        <div className="flex justify-end space-x-3 pt-6 mt-2 border-t border-[var(--color-border)]">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-5 py-2.5 text-sm font-medium text-[#3b82f6] bg-white border border-[#e5e5e5] rounded-lg hover:bg-[#f8faff] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/30 transition-all duration-200 h-11 flex items-center"
+            className="px-5 py-2.5 text-sm font-medium text-[var(--color-foreground)] bg-white border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-blue)]/30 transition-all duration-200 h-11 flex items-center disabled:opacity-50"
           >
             Annuler
           </button>
@@ -232,8 +243,9 @@ export default function QuickStockExitModal({ isOpen, onClose, onSuccess }) {
             type="button"
             onClick={submit}
             disabled={loading}
-            className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#3b82f6] to-[#2563eb] border border-transparent rounded-lg hover:from-[#3b82f6]/90 hover:to-[#2563eb]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3b82f6]/50 transition-all duration-200 h-11 flex items-center shadow-md hover:shadow-lg"
+            className="px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-blue)] hover:bg-[var(--color-blue)]/90 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-blue)]/50 transition-all duration-200 h-11 flex items-center shadow-md hover:shadow-lg disabled:opacity-50"
           >
+            {" "}
             {loading ? "Enregistrement..." : "Enregistrer la sortie"}
           </button>
         </div>

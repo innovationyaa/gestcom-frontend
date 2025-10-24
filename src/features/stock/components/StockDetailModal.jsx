@@ -263,8 +263,7 @@ export function StockDetailModal({
                 <Package className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
             )}
-          </div>{" "}
-          <div className="flex-1 min-w-0">
+          </div>          <div className="flex-1 min-w-0">
             <h3 className="text-lg sm:text-xl font-semibold text-[var(--color-foreground)] mb-1 sm:mb-2 truncate">
               {item.nom}
             </h3>
@@ -284,8 +283,7 @@ export function StockDetailModal({
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
           {getStatusBadge(item.status)}
         </div>
-      </div>{" "}
-      {/* Stock Adjustment Form */}
+      </div>      {/* Stock Adjustment Form */}
       {showAdjustments && showAdjustmentForm && (
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
           <CardHeader className="pb-2 sm:pb-3">
@@ -467,8 +465,7 @@ export function StockDetailModal({
                     </div>
                   )}
               </div>
-            )}{" "}
-            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 mt-4 border-t border-[#e5f2ff]">
+            )}            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 mt-4 border-t border-[#e5f2ff]">
               <button
                 type="button"
                 onClick={() => setShowAdjustmentForm(false)}
@@ -496,8 +493,7 @@ export function StockDetailModal({
             </div>
           </CardContent>
         </Card>
-      )}{" "}
-      {/* Actions */}
+      )}{" "}      {/* Actions */}
       {showAdjustments && (
         <div className="flex items-center gap-2 p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200/50">
           <Button

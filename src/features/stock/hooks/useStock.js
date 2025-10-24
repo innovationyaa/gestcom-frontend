@@ -1,48 +1,56 @@
 import { useState, useEffect, useMemo } from "react";
-import centralDataService from "@/services/centralDataService";
+import { useArticles } from "./useArticles";
 import {
-  prepareStockData,
   searchStockItems,
   sortStockItems,
   filterByStatus,
 } from "../utils/stockHelpers";
 
+/**
+ * Main stock hook - uses useArticles for backend integration
+ * @deprecated Use useArticles() directly for new code
+ */
 export function useStock() {
-  const [stockItems, setStockItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { articles, loading, error, addArticle } = useArticles();
 
-  useEffect(() => {
-    const loadStock = async () => {
-      try {
-        setLoading(true);
-        const data = await centralDataService.getStock();
-        setStockItems(prepareStockData(data));
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Map articles to legacy stockItems format for backwards compatibility
+  const stockItems = useMemo(() => {
+    return articles.map((article) => ({
+      ...article,
+      // Legacy field mappings for old code compatibility
+      quantite: article.quantiteActuelle,
+      prix: article.prixVente,
+      seuilMinimum: article.seuilMinimum,
+      prixAchat: article.prixAchat,
+      prixVente: article.prixVente,
+      // Fournisseur name for display
+      fournisseurNom: article.fournisseur?.nom || null,
+    }));
+  }, [articles]);
 
-    loadStock();
-  }, []);
-
+  // Legacy addStockItem wrapper
   const addStockItem = async (newItem) => {
     try {
-      await centralDataService.addStockItem(newItem);
-      const updated = await centralDataService.getStock();
-      setStockItems(prepareStockData(updated));
+      const result = await addArticle(newItem);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result;
     } catch (error) {
       console.error("Error adding stock item:", error);
       throw error;
     }
   };
 
-  return { stockItems, loading, error, setStockItems, addStockItem };
+  return { stockItems, loading, error, addStockItem };
 }
 
+/**
+ * Stock statistics hook - calculates stats from real articles
+ */
 export function useStockStats() {
+  const { articles, loading, error } = useArticles();
+
   const [stats, setStats] = useState({
     total: 0,
     outOfStock: 0,
@@ -50,24 +58,25 @@ export function useStockStats() {
     totalValue: 0,
     inStock: 0,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadStats = async () => {
-      try {
-        setLoading(true);
-        const data = await centralDataService.getStockStats();
-        setStats(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStats();
-  }, []);
+    if (articles.length > 0) {
+      const calculated = {
+        total: articles.length,
+        outOfStock: articles.filter((a) => a.quantiteActuelle === 0).length,
+        lowStock: articles.filter(
+          (a) => a.quantiteActuelle > 0 && a.quantiteActuelle <= a.seuilMinimum
+        ).length,
+        totalValue: articles.reduce(
+          (sum, a) => sum + a.quantiteActuelle * a.prixAchat,
+          0
+        ),
+        inStock: articles.filter((a) => a.quantiteActuelle > a.seuilMinimum)
+          .length,
+      };
+      setStats(calculated);
+    }
+  }, [articles]);
 
   return { stats, loading, error };
 }

@@ -1,50 +1,51 @@
-import api from "./api";
+import axios from "axios";
 
 /**
- * Fournisseurs service with mock mode support.
- * - When VITE_USE_MOCK_API=true: uses local fake data
- * - When false: calls real Django backend
+ * Fournisseurs service - Direct Django backend connection
+ * Backend URL: http://127.0.0.1:8000/api/fournisseurs/
+ *
+ * Field Mapping (Backend ↔ Frontend):
+ * - if_fiscal ↔ ifNumber
+ * - date_creation ↔ dateCreation
  */
 
-const USE_MOCK =
-  import.meta.env.VITE_USE_MOCK_API === "true" ||
-  (typeof process !== "undefined" &&
-    process.env?.REACT_APP_USE_MOCK_API === "true");
+const BACKEND_URL = "http://127.0.0.1:8000/api";
 
-// Simulate network delay for realism
-const mockDelay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+/**
+ * Normalize backend response (snake_case → camelCase)
+ */
+const normalizeFournisseur = (fournisseur) => {
+  if (!fournisseur) return null;
 
-// Mock fournisseurs data
-let mockFournisseursData = [
-  {
-    id: 1,
-    nom: "Fournisseur A",
-    ice: "12345678",
-    ifNumber: "IF123456",
-    contact: "contact@fournisseur-a.com",
-    adresse: "123 Rue Principal, Casablanca",
-    dateCreation: "2024-01-15",
-  },
-  {
-    id: 2,
-    nom: "Fournisseur B",
-    ice: "87654321",
-    ifNumber: "IF654321",
-    contact: "info@fournisseur-b.com",
-    adresse: "456 Avenue Centrale, Rabat",
-    dateCreation: "2024-01-20",
-  },
-  {
-    id: 3,
-    nom: "Fournisseur C",
-    ice: "11223344",
-    ifNumber: "IF112233",
-    contact: "hello@fournisseur-c.com",
-    adresse: "789 Boulevard Nord, Fès",
-    dateCreation: "2024-02-01",
-  },
-];
+  return {
+    id: fournisseur.id,
+    nom: fournisseur.nom,
+    ice: fournisseur.ice,
+    ifNumber: fournisseur.if_fiscal, // Backend → Frontend
+    contact: fournisseur.contact,
+    adresse: fournisseur.adresse,
+    dateCreation: fournisseur.date_creation, // Backend → Frontend
+  };
+};
+
+/**
+ * Denormalize frontend data (camelCase → snake_case)
+ */
+const denormalizeFournisseur = (fournisseur) => {
+  const payload = {
+    nom: fournisseur.nom,
+    ice: fournisseur.ice,
+    contact: fournisseur.contact,
+    adresse: fournisseur.adresse,
+  };
+
+  // Map ifNumber to if_fiscal
+  if (fournisseur.ifNumber !== undefined) {
+    payload.if_fiscal = fournisseur.ifNumber;
+  }
+
+  return payload;
+};
 
 const fournisseursService = {
   /**
@@ -53,14 +54,15 @@ const fournisseursService = {
    * @returns {Promise} Array of fournisseurs
    */
   getAll: async (params = {}) => {
-    if (USE_MOCK) {
-      await mockDelay(400);
-      return mockFournisseursData;
-    }
-
     try {
-      const response = await api.get("/fournisseurs/", { params });
-      return response.data;
+      const response = await axios.get(`${BACKEND_URL}/fournisseurs/`, {
+        params,
+      });
+
+      // Normalize each fournisseur
+      return Array.isArray(response.data)
+        ? response.data.map(normalizeFournisseur)
+        : [];
     } catch (error) {
       console.error("Failed to fetch fournisseurs:", error);
       throw error;
@@ -73,14 +75,9 @@ const fournisseursService = {
    * @returns {Promise} Fournisseur object
    */
   getById: async (id) => {
-    if (USE_MOCK) {
-      await mockDelay(300);
-      return mockFournisseursData.find((item) => item.id === id);
-    }
-
     try {
-      const response = await api.get(`/fournisseurs/${id}/`);
-      return response.data;
+      const response = await axios.get(`${BACKEND_URL}/fournisseurs/${id}/`);
+      return normalizeFournisseur(response.data);
     } catch (error) {
       console.error("Failed to fetch fournisseur:", error);
       throw error;
@@ -93,20 +90,13 @@ const fournisseursService = {
    * @returns {Promise} Created fournisseur
    */
   create: async (payload) => {
-    if (USE_MOCK) {
-      await mockDelay(500);
-      const newFournisseur = {
-        id: Math.max(...mockFournisseursData.map((f) => f.id), 0) + 1,
-        ...payload,
-        dateCreation: new Date().toISOString().split("T")[0],
-      };
-      mockFournisseursData.push(newFournisseur);
-      return newFournisseur;
-    }
-
     try {
-      const response = await api.post("/fournisseurs/", payload);
-      return response.data;
+      const denormalized = denormalizeFournisseur(payload);
+      const response = await axios.post(
+        `${BACKEND_URL}/fournisseurs/`,
+        denormalized
+      );
+      return normalizeFournisseur(response.data);
     } catch (error) {
       console.error("Failed to create fournisseur:", error);
       throw error;
@@ -114,30 +104,41 @@ const fournisseursService = {
   },
 
   /**
-   * Update fournisseur
+   * Update fournisseur (PUT - full update)
    * @param {number} id - Fournisseur ID
    * @param {object} payload - Updated data
    * @returns {Promise} Updated fournisseur
    */
   update: async (id, payload) => {
-    if (USE_MOCK) {
-      await mockDelay(400);
-      const index = mockFournisseursData.findIndex((f) => f.id === id);
-      if (index !== -1) {
-        mockFournisseursData[index] = {
-          ...mockFournisseursData[index],
-          ...payload,
-        };
-        return mockFournisseursData[index];
-      }
-      throw new Error("Fournisseur not found");
-    }
-
     try {
-      const response = await api.put(`/fournisseurs/${id}/`, payload);
-      return response.data;
+      const denormalized = denormalizeFournisseur(payload);
+      const response = await axios.put(
+        `${BACKEND_URL}/fournisseurs/${id}/`,
+        denormalized
+      );
+      return normalizeFournisseur(response.data);
     } catch (error) {
       console.error("Failed to update fournisseur:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Partial update fournisseur (PATCH)
+   * @param {number} id - Fournisseur ID
+   * @param {object} payload - Partial update data
+   * @returns {Promise} Updated fournisseur
+   */
+  partialUpdate: async (id, payload) => {
+    try {
+      const denormalized = denormalizeFournisseur(payload);
+      const response = await axios.patch(
+        `${BACKEND_URL}/fournisseurs/${id}/`,
+        denormalized
+      );
+      return normalizeFournisseur(response.data);
+    } catch (error) {
+      console.error("Failed to partially update fournisseur:", error);
       throw error;
     }
   },
@@ -148,18 +149,8 @@ const fournisseursService = {
    * @returns {Promise} true on success
    */
   delete: async (id) => {
-    if (USE_MOCK) {
-      await mockDelay(300);
-      const index = mockFournisseursData.findIndex((f) => f.id === id);
-      if (index !== -1) {
-        mockFournisseursData.splice(index, 1);
-        return true;
-      }
-      throw new Error("Fournisseur not found");
-    }
-
     try {
-      await api.delete(`/fournisseurs/${id}/`);
+      await axios.delete(`${BACKEND_URL}/fournisseurs/${id}/`);
       return true;
     } catch (error) {
       console.error("Failed to delete fournisseur:", error);

@@ -17,20 +17,14 @@ export default function StockEditModal({ item, onClose, onSave }) {
     reference: item?.reference || "",
     nom: item?.nom || "",
     description: item?.description || "",
-    categorie: item?.categorie || "",
-    quantite: item?.quantite || 0,
+    quantiteActuelle: item?.quantiteActuelle || item?.quantite || 0,
     seuilMinimum: item?.seuilMinimum || 0,
-    seuilMaximum: item?.seuilMaximum || 0,
-    uniteMesure: item?.uniteMesure || "pièces",
     prixAchat: item?.prixAchat || 0,
     prixVente: item?.prixVente || 0,
-    fournisseur:
-      typeof item?.fournisseur === "string"
-        ? item.fournisseur
-        : item?.fournisseur?.nom || "",
-    emplacement: item?.emplacement || "",
-    delaiLivraison: item?.delaiLivraison || 0,
-    imageUrl: item?.imageUrl || "",
+    fournisseurId:
+      typeof item?.fournisseur === "object"
+        ? item.fournisseur?.id
+        : item?.fournisseurId || null,
   });
 
   const [errors, setErrors] = useState({});
@@ -43,7 +37,6 @@ export default function StockEditModal({ item, onClose, onSave }) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -53,8 +46,8 @@ export default function StockEditModal({ item, onClose, onSave }) {
     if (!formData.nom.trim()) {
       newErrors.nom = "Le nom est obligatoire";
     }
-    if (formData.quantite < 0) {
-      newErrors.quantite = "La quantité ne peut pas être négative";
+    if (formData.quantiteActuelle < 0) {
+      newErrors.quantiteActuelle = "La quantité ne peut pas être négative";
     }
     if (formData.prixAchat < 0) {
       newErrors.prixAchat = "Le prix d'achat ne peut pas être négatif";
@@ -75,17 +68,18 @@ export default function StockEditModal({ item, onClose, onSave }) {
     }
 
     setIsLoading(true);
-
     try {
       const stockData = {
-        ...formData,
-        quantite: parseInt(formData.quantite, 10),
+        reference: formData.reference,
+        nom: formData.nom,
+        description: formData.description || "",
+        quantiteActuelle: parseInt(formData.quantiteActuelle, 10),
         seuilMinimum: parseInt(formData.seuilMinimum, 10),
-        seuilMaximum: parseInt(formData.seuilMaximum, 10),
         prixAchat: parseFloat(formData.prixAchat),
         prixVente: parseFloat(formData.prixVente),
-        delaiLivraison: parseInt(formData.delaiLivraison, 10),
-        dateModification: new Date().toISOString().split("T")[0],
+        fournisseurId: formData.fournisseurId
+          ? parseInt(formData.fournisseurId, 10)
+          : null,
       };
 
       await onSave(stockData);
@@ -140,8 +134,7 @@ export default function StockEditModal({ item, onClose, onSave }) {
                 {errors.reference && (
                   <p className="text-sm text-red-500">{errors.reference}</p>
                 )}
-              </div>
-
+              </div>{" "}
               <div className="space-y-1.5">
                 <Label
                   htmlFor="nom"
@@ -161,73 +154,6 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   <p className="text-sm text-red-500">{errors.nom}</p>
                 )}
               </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="categorie"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Catégorie
-                </Label>
-                <Input
-                  id="categorie"
-                  name="categorie"
-                  value={formData.categorie}
-                  onChange={handleChange}
-                  placeholder="Ex: Informatique"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="quantite"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Quantité en stock
-                </Label>
-                <Input
-                  id="quantite"
-                  name="quantite"
-                  type="number"
-                  value={formData.quantite}
-                  onChange={handleChange}
-                  placeholder="0"
-                  min="0"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-                {errors.quantite && (
-                  <p className="text-sm text-red-500">{errors.quantite}</p>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="uniteMesure"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Unité de mesure
-                </Label>
-                <div className="relative">
-                  <select
-                    id="uniteMesure"
-                    name="uniteMesure"
-                    value={formData.uniteMesure}
-                    onChange={handleChange}
-                    className="w-full h-11 pl-3 pr-8 text-sm border border-[#dcfce7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#22c55e]/30 focus:border-[#22c55e] appearance-none bg-[#f0fdf4] transition-all duration-200"
-                  >
-                    <option value="pièces">Pièces</option>
-                    <option value="kg">Kilogramme</option>
-                    <option value="g">Gramme</option>
-                    <option value="L">Litre</option>
-                    <option value="m">Mètre</option>
-                    <option value="m²">Mètre carré</option>
-                    <option value="m³">Mètre cube</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 text-[#737373] pointer-events-none" />
-                </div>
-              </div>
-
               <div className="space-y-1.5">
                 <Label
                   htmlFor="description"
@@ -245,16 +171,35 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm transition-all duration-200 bg-[#f0fdf4] px-3.5 py-2.5 resize-none focus:outline-none"
                 />
               </div>
-            </div>
-
-            {/* Colonne de droite */}
-            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="quantiteActuelle"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  Quantité en stock
+                </Label>
+                <Input
+                  id="quantiteActuelle"
+                  name="quantiteActuelle"
+                  type="number"
+                  value={formData.quantiteActuelle}
+                  onChange={handleChange}
+                  placeholder="0"
+                  min="0"
+                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
+                />
+                {errors.quantiteActuelle && (
+                  <p className="text-sm text-red-500">
+                    {errors.quantiteActuelle}
+                  </p>
+                )}
+              </div>
               <div className="space-y-1.5">
                 <Label
                   htmlFor="seuilMinimum"
                   className="text-sm font-medium text-[#171717]"
                 >
-                  Seuil minimum
+                  Seuil d'alerte minimum
                 </Label>
                 <Input
                   id="seuilMinimum"
@@ -262,37 +207,20 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   type="number"
                   value={formData.seuilMinimum}
                   onChange={handleChange}
-                  placeholder="5"
+                  placeholder="0"
                   min="0"
                   className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
                 />
               </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="seuilMaximum"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Seuil maximum
-                </Label>
-                <Input
-                  id="seuilMaximum"
-                  name="seuilMaximum"
-                  type="number"
-                  value={formData.seuilMaximum}
-                  onChange={handleChange}
-                  placeholder="100"
-                  min="0"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-              </div>
-
+            </div>{" "}
+            {/* Colonne de droite */}
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label
                   htmlFor="prixAchat"
                   className="text-sm font-medium text-[#171717]"
                 >
-                  Prix d'achat (€)
+                  Prix d'achat (MAD) <span className="text-[#ef4444]">*</span>
                 </Label>
                 <Input
                   id="prixAchat"
@@ -303,6 +231,7 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   onChange={handleChange}
                   placeholder="0.00"
                   min="0"
+                  required
                   className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
                 />
                 {errors.prixAchat && (
@@ -315,7 +244,7 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   htmlFor="prixVente"
                   className="text-sm font-medium text-[#171717]"
                 >
-                  Prix de vente (€)
+                  Prix de vente (MAD) <span className="text-[#ef4444]">*</span>
                 </Label>
                 <Input
                   id="prixVente"
@@ -326,6 +255,7 @@ export default function StockEditModal({ item, onClose, onSave }) {
                   onChange={handleChange}
                   placeholder="0.00"
                   min="0"
+                  required
                   className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
                 />
                 {errors.prixVente && (
@@ -333,69 +263,32 @@ export default function StockEditModal({ item, onClose, onSave }) {
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="fournisseur"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Fournisseur
-                </Label>
-                <Input
-                  id="fournisseur"
-                  name="fournisseur"
-                  value={formData.fournisseur}
-                  onChange={handleChange}
-                  placeholder="Nom du fournisseur"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="emplacement"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Emplacement
-                </Label>
-                <Input
-                  id="emplacement"
-                  name="emplacement"
-                  value={formData.emplacement}
-                  onChange={handleChange}
-                  placeholder="Ex: Allée A, Étagère 3"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="imageUrl"
-                  className="text-sm font-medium text-[#171717]"
-                >
-                  Image de l'article
-                </Label>
-                <Input
-                  id="imageUrl"
-                  name="imageUrl"
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://exemple.com/image.jpg"
-                  className="w-full border-[#dcfce7] focus:border-[#22c55e] focus:ring-2 focus:ring-[#22c55e]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#f0fdf4] px-3.5 focus:outline-none"
-                />
-                <div className="mt-2">
-                  {formData.imageUrl ? (
-                    <img
-                      src={formData.imageUrl}
-                      alt="Aperçu"
-                      className="h-20 w-20 object-cover rounded border border-[#dcfce7] bg-white"
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                      }}
-                    />
-                  ) : (
-                    <span className="text-xs text-[#737373]">Aucune image</span>
-                  )}
+              {/* Display calculated metrics */}
+              <div className="space-y-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Marge:</span>
+                  <span className="font-medium text-green-700">
+                    {formData.prixVente && formData.prixAchat
+                      ? `${(formData.prixVente - formData.prixAchat).toFixed(2)} MAD`
+                      : "0.00 MAD"}
+                  </span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Taux de marge:</span>
+                  <span className="font-medium text-green-700">
+                    {formData.prixVente && formData.prixAchat
+                      ? `${(((formData.prixVente - formData.prixAchat) / formData.prixVente) * 100).toFixed(1)}%`
+                      : "0%"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Valeur du stock:</span>
+                  <span className="font-medium text-green-700">
+                    {formData.quantiteActuelle && formData.prixAchat
+                      ? `${(formData.quantiteActuelle * formData.prixAchat).toFixed(2)} MAD`
+                      : "0.00 MAD"}
+                  </span>
+                </div>{" "}
               </div>
             </div>
           </div>

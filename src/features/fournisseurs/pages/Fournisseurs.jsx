@@ -23,20 +23,21 @@ export const Fournisseurs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFournisseur, setSelectedFournisseur] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-
   const { fournisseurs, loading, error, addFournisseur, deleteFournisseur } =
     useFournisseurs();
 
-  // Filter fournisseurs based on search
+  // Filter fournisseurs based on search (handle null values safely)
   const filteredFournisseurs = useMemo(() => {
+    if (!searchTerm) return fournisseurs;
+
     return fournisseurs.filter((fournisseur) => {
       const searchLower = searchTerm.toLowerCase();
       return (
-        fournisseur.nom.toLowerCase().includes(searchLower) ||
-        fournisseur.ice.includes(searchTerm) ||
-        fournisseur.ifNumber.includes(searchTerm) ||
-        fournisseur.contact.toLowerCase().includes(searchLower) ||
-        fournisseur.adresse.toLowerCase().includes(searchLower)
+        (fournisseur.nom || "").toLowerCase().includes(searchLower) ||
+        (fournisseur.ice || "").toLowerCase().includes(searchLower) ||
+        (fournisseur.ifNumber || "").toLowerCase().includes(searchLower) ||
+        (fournisseur.contact || "").toLowerCase().includes(searchLower) ||
+        (fournisseur.adresse || "").toLowerCase().includes(searchLower)
       );
     });
   }, [fournisseurs, searchTerm]);
