@@ -12,7 +12,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export default function FournisseurEditModal({ fournisseur, open, onClose, onSave }) {
+export default function FournisseurEditModal({
+  fournisseur,
+  open,
+  onClose,
+  onSave,
+}) {
   const [form, setForm] = useState({
     nom: fournisseur?.nom || "",
     ice: fournisseur?.ice || "",
@@ -46,7 +51,8 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) setErrors((prev) => ({ ...prev, [e.target.name]: null }));
+    if (errors[e.target.name])
+      setErrors((prev) => ({ ...prev, [e.target.name]: null }));
   };
 
   const handleSubmit = async (e) => {
@@ -85,7 +91,12 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto -mx-2 px-2">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="nom" className="text-sm font-medium text-[#171717]">Nom <span className="text-[#ef4444]">*</span></Label>
+                <Label
+                  htmlFor="nom"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  Nom <span className="text-[#ef4444]">*</span>
+                </Label>
                 <Input
                   id="nom"
                   name="nom"
@@ -95,10 +106,17 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
                   className="w-full border-[#dbeafe] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#eff6ff] px-3.5 focus:outline-none focus:ring-offset-1 focus:ring-offset-transparent"
                   required
                 />
-                {errors.nom && <span className="text-xs text-red-500">{errors.nom}</span>}
+                {errors.nom && (
+                  <span className="text-xs text-red-500">{errors.nom}</span>
+                )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="ice" className="text-sm font-medium text-[#171717]">ICE <span className="text-[#ef4444]">*</span></Label>
+                <Label
+                  htmlFor="ice"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  ICE <span className="text-[#ef4444]">*</span>
+                </Label>
                 <Input
                   id="ice"
                   name="ice"
@@ -108,10 +126,17 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
                   className="w-full border-[#dbeafe] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#eff6ff] px-3.5 focus:outline-none"
                   required
                 />
-                {errors.ice && <span className="text-xs text-red-500">{errors.ice}</span>}
+                {errors.ice && (
+                  <span className="text-xs text-red-500">{errors.ice}</span>
+                )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="ifNumber" className="text-sm font-medium text-[#171717]">IF <span className="text-[#ef4444]">*</span></Label>
+                <Label
+                  htmlFor="ifNumber"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  IF <span className="text-[#ef4444]">*</span>
+                </Label>
                 <Input
                   id="ifNumber"
                   name="ifNumber"
@@ -121,12 +146,21 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
                   className="w-full border-[#dbeafe] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#eff6ff] px-3.5 focus:outline-none"
                   required
                 />
-                {errors.ifNumber && <span className="text-xs text-red-500">{errors.ifNumber}</span>}
+                {errors.ifNumber && (
+                  <span className="text-xs text-red-500">
+                    {errors.ifNumber}
+                  </span>
+                )}
               </div>
             </div>
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="contact" className="text-sm font-medium text-[#171717]">Contact <span className="text-[#ef4444]">*</span></Label>
+                <Label
+                  htmlFor="contact"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  Contact <span className="text-[#ef4444]">*</span>
+                </Label>
                 <Input
                   id="contact"
                   name="contact"
@@ -136,10 +170,17 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
                   className="w-full border-[#dbeafe] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/30 rounded-lg text-sm h-11 transition-all duration-200 bg-[#eff6ff] px-3.5 focus:outline-none"
                   required
                 />
-                {errors.contact && <span className="text-xs text-red-500">{errors.contact}</span>}
+                {errors.contact && (
+                  <span className="text-xs text-red-500">{errors.contact}</span>
+                )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="adresse" className="text-sm font-medium text-[#171717]">Adresse <span className="text-[#ef4444]">*</span></Label>
+                <Label
+                  htmlFor="adresse"
+                  className="text-sm font-medium text-[#171717]"
+                >
+                  Adresse <span className="text-[#ef4444]">*</span>
+                </Label>
                 <Textarea
                   id="adresse"
                   name="adresse"
@@ -150,16 +191,35 @@ export default function FournisseurEditModal({ fournisseur, open, onClose, onSav
                   required
                   rows={3}
                 />
-                {errors.adresse && <span className="text-xs text-red-500">{errors.adresse}</span>}
+                {errors.adresse && (
+                  <span className="text-xs text-red-500">{errors.adresse}</span>
+                )}
               </div>
             </div>
           </div>
           <div className="flex justify-end mt-6 gap-2">
-            <Button type="button" variant="secondary" size="lg" onClick={onClose} className="rounded-lg h-11 px-6 text-sm bg-[#e0e7ff] text-[#2563eb] hover:bg-[#c7d2fe]">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              onClick={onClose}
+              className="rounded-lg h-11 px-6 text-sm bg-[#e0e7ff] text-[#2563eb] hover:bg-[#c7d2fe]"
+            >
               Annuler
             </Button>
-            <Button type="submit" variant="default" size="lg" className="rounded-lg h-11 px-6 text-sm bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4 mr-1" />} Enregistrer
+            <Button
+              type="submit"
+              variant="default"
+              size="lg"
+              className="rounded-lg h-11 px-6 text-sm bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin h-4 w-4" />
+              ) : (
+                <Save className="h-4 w-4 mr-1" />
+              )}{" "}
+              Enregistrer
             </Button>
           </div>
         </form>

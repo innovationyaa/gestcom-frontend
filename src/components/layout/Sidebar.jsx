@@ -11,6 +11,7 @@ import {
   ChevronDown,
   User,
   CreditCard,
+  FileText,
 } from "lucide-react";
 
 const menuItems = [
@@ -49,7 +50,22 @@ const menuItems = [
     title: "Charges",
     href: "/charges",
     icon: CreditCard,
-    disabled: true,
+    items: [
+      { title: "Aperçu", href: "/charges" },
+      { title: "Fournisseurs", href: "/charges/fournisseurs" },
+      { title: "Salariales", href: "/charges/salariales" },
+      { title: "Fixes", href: "/charges/fixes" },
+    ],
+  },
+  {
+    title: "Achats",
+    href: "/achats",
+    icon: FileText,
+    items: [
+      { title: "Réceptions", href: "/achats/receptions" },
+      { title: "Factures", href: "/achats/factures" },
+      { title: "Avoirs", href: "/achats/avoirs" },
+    ],
   },
 ];
 

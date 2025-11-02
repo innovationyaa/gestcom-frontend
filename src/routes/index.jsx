@@ -12,6 +12,19 @@ const StockSorties = lazy(() => import("@/features/stock/pages/StockSorties"));
 const Fournisseurs = lazy(
   () => import("@/features/fournisseurs/pages/Fournisseurs")
 );
+const Receptions = lazy(() => import("@/features/achats/pages/Receptions"));
+const Factures = lazy(() => import("@/features/achats/pages/Factures"));
+const Avoirs = lazy(() => import("@/features/achats/pages/Avoirs"));
+const ChargesApercu = lazy(
+  () => import("@/features/charges/pages/ChargesApercu")
+);
+const ChargesFournisseurs = lazy(
+  () => import("@/features/charges/pages/ChargesFournisseurs")
+);
+const ChargesSalariales = lazy(
+  () => import("@/features/charges/pages/ChargesSalariales")
+);
+const ChargesFixe = lazy(() => import("@/features/charges/pages/ChargesFixe"));
 
 const AppRoutes = () => {
   const { loading } = useAuth();
@@ -44,11 +57,25 @@ const AppRoutes = () => {
           }
         >
           <Route index element={<Navigate to="/stock" replace />} />
+          {/*  */}
           <Route path="stock" element={<Stock />} />
           <Route path="stock/entrees" element={<StockEntrees />} />
           <Route path="stock/sorties" element={<StockSorties />} />
+          {/*  */}
           <Route path="fournisseurs" element={<Fournisseurs />} />
-
+          {/*  */}
+          <Route path="achats/receptions" element={<Receptions />} />
+          <Route path="achats/factures" element={<Factures />} />
+          <Route path="achats/avoirs" element={<Avoirs />} />
+          {/*  */}
+          <Route path="charges" element={<ChargesApercu />} />
+          <Route
+            path="charges/fournisseurs"
+            element={<ChargesFournisseurs />}
+          />
+          <Route path="charges/salariales" element={<ChargesSalariales />} />
+          <Route path="charges/fixes" element={<ChargesFixe />} />
+          {/*  */}
           {/* Placeholder routes for future features */}
           <Route
             path="clients"
@@ -87,14 +114,6 @@ const AppRoutes = () => {
             element={
               <div className="p-8 text-center text-muted-foreground">
                 Paramètres (à venir)
-              </div>
-            }
-          />
-          <Route
-            path="charges"
-            element={
-              <div className="p-8 text-center text-muted-foreground">
-                Fonctionnalité Charges (à venir)
               </div>
             }
           />
