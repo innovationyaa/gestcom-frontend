@@ -9,7 +9,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 
-export default function ChargeFournisseurDetailModal({ charge, open, onClose }) {
+export default function ChargeFournisseurDetailModal({
+  charge,
+  open,
+  onClose,
+}) {
   if (!charge) return null;
 
   const statusConfig = {
@@ -24,7 +28,9 @@ export default function ChargeFournisseurDetailModal({ charge, open, onClose }) 
     <Dialog open={!!open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl bg-white rounded-md border-0">
         <DialogHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 rounded-t-md -mx-6 -mt-6">
-          <DialogTitle className="text-white">Détails Charge Fournisseur</DialogTitle>
+          <DialogTitle className="text-white">
+            Détails Charge Fournisseur
+          </DialogTitle>
           <DialogDescription className="text-blue-100 text-sm">
             {charge.libelle}
           </DialogDescription>
@@ -37,38 +43,60 @@ export default function ChargeFournisseurDetailModal({ charge, open, onClose }) 
           </div>
 
           <div>
-            <p className="text-xs text-[var(--color-foreground-muted)]">Fournisseur</p>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Fournisseur
+            </p>
             <div className="font-medium">{charge.fournisseur}</div>
           </div>
 
           <div>
-            <p className="text-xs text-[var(--color-foreground-muted)]">Catégorie</p>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Catégorie
+            </p>
             <div className="font-medium">{charge.categorie}</div>
           </div>
 
           <div>
-            <p className="text-xs text-[var(--color-foreground-muted)]">Statut</p>
-            <Badge className={`${status.tone} border-transparent`}>{status.label}</Badge>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Statut
+            </p>
+            <Badge className={`${status.tone} border-transparent`}>
+              {status.label}
+            </Badge>
           </div>
 
           <div>
-            <p className="text-xs text-[var(--color-foreground-muted)]">Montant HT</p>
-            <div className="font-semibold">{charge.montantHT?.toLocaleString()} DH</div>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Montant HT
+            </p>
+            <div className="font-semibold">
+              {charge.montantHT?.toLocaleString()} DH
+            </div>
           </div>
 
           <div>
             <p className="text-xs text-[var(--color-foreground-muted)]">TVA</p>
-            <div className="font-semibold">{charge.tva}% ({charge.montantTVA?.toLocaleString()} DH)</div>
+            <div className="font-semibold">
+              {charge.tva}% ({charge.montantTVA?.toLocaleString()} DH)
+            </div>
           </div>
 
           <div className="sm:col-span-2">
-            <p className="text-xs text-[var(--color-foreground-muted)]">Montant TTC</p>
-            <div className="text-[var(--color-blue)] text-lg font-bold">{charge.montantTTC?.toLocaleString()} DH</div>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Montant TTC
+            </p>
+            <div className="text-[var(--color-blue)] text-lg font-bold">
+              {charge.montantTTC?.toLocaleString()} DH
+            </div>
           </div>
 
           <div className="sm:col-span-2">
-            <p className="text-xs text-[var(--color-foreground-muted)]">Notes</p>
-            <div className="text-sm text-[var(--color-foreground)] whitespace-pre-wrap">{charge.notes || "-"}</div>
+            <p className="text-xs text-[var(--color-foreground-muted)]">
+              Notes
+            </p>
+            <div className="text-sm text-[var(--color-foreground)] whitespace-pre-wrap">
+              {charge.notes || "-"}
+            </div>
           </div>
         </div>
       </DialogContent>

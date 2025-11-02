@@ -14,6 +14,7 @@ import {
 import { useChargesFixe } from "../hooks/useChargesFixe";
 import ChargeFixeAddModal from "../components/ChargeFixeAddModal";
 import ChargesFixeTable from "../components/ChargesFixeTable";
+import ChargeFixeDetailModal from "../components/ChargeFixeDetailModal";
 
 export default function ChargesFixe() {
   const [filters, setFilters] = useState({
@@ -22,9 +23,16 @@ export default function ChargesFixe() {
     sortBy: "date_desc",
   });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedCharge, setSelectedCharge] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const { charges, stats, loading, error, createCharge } =
     useChargesFixe(filters);
+
+  const handleView = (charge) => {
+    setSelectedCharge(charge);
+    setShowDetailModal(true);
+  };
 
   // Map stats for display
   const displayStats = {
@@ -206,7 +214,7 @@ export default function ChargesFixe() {
         <ChargesFixeTable
           charges={charges}
           loading={loading}
-          onView={(charge) => console.log("View:", charge)}
+          onView={handleView}
           onEdit={(charge) => console.log("Edit:", charge)}
           onDelete={(charge) => console.log("Delete:", charge)}
         />
@@ -217,6 +225,16 @@ export default function ChargesFixe() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onCreate={createCharge}
+      />
+
+      {/* Detail modal using existing component */}
+      <ChargeFixeDetailModal
+        charge={showDetailModal ? selectedCharge : null}
+        open={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false);
+          setSelectedCharge(null);
+        }}
       />
     </div>
   );

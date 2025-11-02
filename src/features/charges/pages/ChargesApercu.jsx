@@ -164,7 +164,7 @@ export default function ChargesApercu() {
             size="sm"
             variant="outline"
             onClick={() => navigate("/charges/fournisseurs")}
-            className="text-[var(--color-blue)] border-[var(--color-blue)] hover:bg-blue-50"
+            className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
           >
             Voir tout
             <ArrowRight className="h-4 w-4 ml-1" />
@@ -185,7 +185,7 @@ export default function ChargesApercu() {
             size="sm"
             variant="outline"
             onClick={() => navigate("/charges/salariales")}
-            className="text-[var(--color-blue)] border-[var(--color-blue)] hover:bg-blue-50"
+            className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
           >
             Voir tout
             <ArrowRight className="h-4 w-4 ml-1" />
@@ -206,7 +206,7 @@ export default function ChargesApercu() {
             size="sm"
             variant="outline"
             onClick={() => navigate("/charges/fixes")}
-            className="text-[var(--color-blue)] border-[var(--color-blue)] hover:bg-blue-50"
+            className="bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
           >
             Voir tout
             <ArrowRight className="h-4 w-4 ml-1" />
